@@ -82,7 +82,7 @@ return [
             /*
              * Absolute path to location where parsed annotations will be stored
              */
-            'docs' => env('L5_SWAGGER_DOCS_PATH', storage_path('api-docs')),
+            'docs' => storage_path('api-docs'),
 
             /*
              * Absolute path to directory where to export views
