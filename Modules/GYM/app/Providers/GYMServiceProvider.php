@@ -2,6 +2,8 @@
 
 namespace Modules\GYM\app\Providers;
 
+use Modules\GYM\app\Contracts\AuthRepositoryInterface;
+use Modules\GYM\app\Repositories\AuthRepository;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
 
@@ -37,6 +39,7 @@ class GYMServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->app->bind(AuthRepositoryInterface::class, AuthRepository::class);
         $this->app->register(RouteServiceProvider::class);
     }
 
