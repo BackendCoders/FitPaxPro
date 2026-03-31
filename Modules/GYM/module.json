@@ -1,0 +1,11 @@
+{
+    "name": "GYM",
+    "alias": "gym",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\GYM\\app\\Providers\\GYMServiceProvider"
+    ],
+    "files": []
+}

@@ -1,0 +1,6 @@
+{
+    "Inventory": true,
+    "Admin": true,
+    "GYM": true,
+    "Users": true
+}
