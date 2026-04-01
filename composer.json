@@ -31,8 +31,21 @@
             "App\\": "app/",
             "Modules\\": "Modules/",
             "Illuminate\\Console\\": "app/Illuminate/Console/",
+            "PhpOffice\\PhpSpreadsheet\\": "vendor/phpoffice/phpspreadsheet/src/PhpSpreadsheet/",
+            "Maatwebsite\\Excel\\": "vendor/maatwebsite/excel/src/",
+            "Matrix\\": "vendor/markbaker/matrix/classes/src/",
+            "Complex\\": "vendor/markbaker/complex/classes/src/",
+            "Composer\\Pcre\\": "vendor/composer/pcre/src/",
+            "Composer\\Semver\\": "vendor/composer/semver/src/",
+            "ZipStream\\": "vendor/maennchen/zipstream-php/src/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
+        },
+        "psr-0": {
+            "HTMLPurifier": "vendor/ezyang/htmlpurifier/library/"
+        },
+        "files": [
+            "vendor/ezyang/htmlpurifier/library/HTMLPurifier.composer.php"
         }
     },
     "autoload-dev": {
