@@ -7,11 +7,109 @@
     },
     "servers": [
         {
-            "url": "/api",
-            "description": "API Server"
+            "url": "http://localhost/fitpaxpro/FitPaxPro/public",
+            "description": "Application Server"
         }
     ],
     "paths": {
+        "/api/admin/login": {
+            "post": {
+                "tags": [
+                    "Admin Auth"
+                ],
+                "summary": "Authenticate an admin account",
+                "description": "Logs in a super admin using email and password and returns a Sanctum bearer token. Super admin users are identified by user_type = 0 in the existing system.",
+                "operationId": "fff602ba09ada3bd4325f5a720a3e2a1",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "admin@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "Password@123"
+                                    },
+                                    "device_name": {
+                                        "type": "string",
+                                        "example": "swagger-ui",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Admin login successful."
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "token": {
+                                                    "type": "string",
+                                                    "example": "1|sanctumtoken"
+                                                },
+                                                "admin": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "Super Admin"
+                                                        },
+                                                        "email": {
+                                                            "type": "string",
+                                                            "format": "email",
+                                                            "example": "superadmin@example.com"
+                                                        },
+                                                        "user_type": {
+                                                            "description": "Super admin user type",
+                                                            "type": "integer",
+                                                            "example": 0
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation or authentication error"
+                    }
+                }
+            }
+        },
         "/api/gym/register": {
             "post": {
                 "tags": [
@@ -221,6 +319,10 @@
         }
     },
     "tags": [
+        {
+            "name": "Admin Auth",
+            "description": "Admin authentication endpoints."
+        },
         {
             "name": "Gym Auth",
             "description": "Gym Auth"

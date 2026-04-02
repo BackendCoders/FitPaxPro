@@ -10,8 +10,8 @@ namespace Modules\GYM\app\Swagger;
  * )
  *
  * @OA\Server(
- *     url="/api",
- *     description="API Server"
+ *     url=L5_SWAGGER_CONST_HOST,
+ *     description="Application Server"
  * )
  *
  * @OA\SecurityScheme(

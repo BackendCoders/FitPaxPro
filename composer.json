@@ -46,14 +46,14 @@
         },
         "files": [
             "vendor/ezyang/htmlpurifier/library/HTMLPurifier.composer.php"
-        }
+        ]
     },
     "autoload-dev": {
         "psr-4": {
             "Tests\\": "tests/"
         }
     },
-    "scripts": {
+    "scripts":{
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"

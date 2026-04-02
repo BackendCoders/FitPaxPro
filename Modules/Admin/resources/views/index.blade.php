@@ -1,4 +1,4 @@
-@extends('admin::layouts.master')
+@extends('admin::components.layouts.master')
 
 @section('content')
     <h1>Hello World</h1>
