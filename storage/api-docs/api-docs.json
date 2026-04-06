@@ -110,6 +110,399 @@
                 }
             }
         },
+        "/api/admin/me": {
+            "get": {
+                "tags": [
+                    "Admin Auth"
+                ],
+                "summary": "Get authenticated admin profile",
+                "description": "Returns the currently authenticated admin user based on the provided Sanctum bearer token.",
+                "operationId": "48bfb1d39ddc90f215a0f9fbbdbd76c3",
+                "responses": {
+                    "200": {
+                        "description": "Admin profile fetched",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Admin profile fetched successfully."
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "admin": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "Super Admin"
+                                                        },
+                                                        "email": {
+                                                            "type": "string",
+                                                            "format": "email",
+                                                            "example": "superadmin@example.com"
+                                                        },
+                                                        "user_type": {
+                                                            "type": "integer",
+                                                            "example": 0
+                                                        },
+                                                        "status": {
+                                                            "type": "boolean",
+                                                            "example": true
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden: non-admin token"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/logout": {
+            "post": {
+                "tags": [
+                    "Admin Auth"
+                ],
+                "summary": "Logout admin and revoke current token",
+                "description": "Revokes the currently used Sanctum access token for the authenticated admin user.",
+                "operationId": "e9936e079bbfdf1e37ae16834aed0ff0",
+                "responses": {
+                    "200": {
+                        "description": "Logout successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Admin logout successful."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden: non-admin token"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/gym-operations/gyms": {
+            "get": {
+                "tags": [
+                    "Gym Operations"
+                ],
+                "summary": "List gyms",
+                "description": "Returns paginated gym records for admin operations.",
+                "operationId": "8fe5a95caa19c2ecc75abbd5b417040d",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Gym list fetched"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden: non-admin token"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/gym-operations/attendance": {
+            "get": {
+                "tags": [
+                    "Gym Operations"
+                ],
+                "summary": "List attendance logs",
+                "description": "Returns paginated attendance logs for admin operations.",
+                "operationId": "e2a3b9437a431bcc74deb484ed6d4dd1",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Attendance list fetched"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden: non-admin token"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/gym-operations/enquiries": {
+            "get": {
+                "tags": [
+                    "Gym Operations"
+                ],
+                "summary": "List gym enquiries",
+                "description": "Returns paginated gym enquiries for admin operations.",
+                "operationId": "07cba8a1911a487dd3700b7d82eaf23d",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Enquiry list fetched"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden: non-admin token"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/gym-operations/fee-plans": {
+            "get": {
+                "tags": [
+                    "Gym Operations"
+                ],
+                "summary": "List gym fee plans",
+                "description": "Returns paginated gym fee plans for admin operations.",
+                "operationId": "6063860caa9d8b97bb0bfdd70a967061",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Fee plan list fetched"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden: non-admin token"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/gym-operations/gallery-media": {
+            "get": {
+                "tags": [
+                    "Gym Operations"
+                ],
+                "summary": "List gym gallery media",
+                "description": "Returns paginated gym gallery media records for admin operations.",
+                "operationId": "8dffe9e3928ede60f2bb441d6b54428e",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Gallery media list fetched"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden: non-admin token"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/gym-operations/reviews": {
+            "get": {
+                "tags": [
+                    "Gym Operations"
+                ],
+                "summary": "List gym reviews",
+                "description": "Returns paginated gym reviews for admin operations.",
+                "operationId": "e215a1d20ea9685397ba62c710a4d126",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Review list fetched"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden: non-admin token"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/gym/register": {
             "post": {
                 "tags": [
@@ -322,6 +715,10 @@
         {
             "name": "Admin Auth",
             "description": "Admin authentication endpoints."
+        },
+        {
+            "name": "Gym Operations",
+            "description": "Admin gym operation management endpoints."
         },
         {
             "name": "Gym Auth",

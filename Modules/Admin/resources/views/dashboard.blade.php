@@ -550,7 +550,7 @@
                                     @if ($module['supports_web'])
                                         <span class="pill">Web</span>
                                     @endif
-                                    @if ($module['supports_api'])
+                 `                   @if ($module['supports_api'])
                                         <span class="pill alt">API</span>
                                     @endif
                                 </div>

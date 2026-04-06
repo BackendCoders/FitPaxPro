@@ -151,6 +151,106 @@ class AdminAuthController extends Controller
         ]);
     }
 
+    /**
+     * Return the authenticated admin profile.
+     *
+     * @OA\Get(
+     *     path="/api/admin/me",
+     *     tags={"Admin Auth"},
+     *     summary="Get authenticated admin profile",
+     *     description="Returns the currently authenticated admin user based on the provided Sanctum bearer token.",
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Admin profile fetched",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Admin profile fetched successfully."),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="admin",
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="name", type="string", example="Super Admin"),
+     *                     @OA\Property(property="email", type="string", format="email", example="superadmin@example.com"),
+     *                     @OA\Property(property="user_type", type="integer", example=0),
+     *                     @OA\Property(property="status", type="boolean", example=true)
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=403, description="Forbidden: non-admin token")
+     * )
+     */
+    public function apiMe(Request $request): JsonResponse
+    {
+        $admin = $request->user();
+
+        if (! $admin || ! $this->isAdmin($admin)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Only admin users can access this endpoint.',
+            ], 403);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Admin profile fetched successfully.',
+            'data' => [
+                'admin' => [
+                    'id' => $admin->id,
+                    'name' => $admin->name,
+                    'email' => $admin->email,
+                    'user_type' => (int) $admin->user_type,
+                    'status' => (bool) $admin->status,
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * Logout the authenticated admin API user.
+     *
+     * @OA\Post(
+     *     path="/api/admin/logout",
+     *     tags={"Admin Auth"},
+     *     summary="Logout admin and revoke current token",
+     *     description="Revokes the currently used Sanctum access token for the authenticated admin user.",
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Logout successful",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Admin logout successful.")
+     *         )
+     *     ),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=403, description="Forbidden: non-admin token")
+     * )
+     */
+    public function apiLogout(Request $request): JsonResponse
+    {
+        $admin = $request->user();
+
+        if (! $admin || ! $this->isAdmin($admin)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Only admin users can access this endpoint.',
+            ], 403);
+        }
+
+        $admin->currentAccessToken()?->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Admin logout successful.',
+        ]);
+    }
+
     protected function resolveAdminByEmail(string $email): ?User
     {
         return User::query()
