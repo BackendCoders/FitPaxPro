@@ -5,7 +5,7 @@
 @section('content')
     @include('admin::components.partials.navigation')
 
-    <section class="page-hero">
+    <!-- <section class="page-hero">
         <article class="surface-card hero-card">
             <span class="hero-kicker">Dashboard Index Page</span>
             <h1 class="hero-title">Dashboard Overview</h1>
@@ -38,7 +38,7 @@
                 </div>
             </article>
         </div>
-    </section>
+    </section> -->
 
     <section class="metrics-grid">
         @foreach ($dashboard['summary'] as $card)

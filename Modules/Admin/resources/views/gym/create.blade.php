@@ -87,7 +87,7 @@
             </p> -->
         </article>
 
-        <div class="side-stack">
+        <!-- <div class="side-stack">
             <article class="surface-card">
                 <div class="section-title">Flow</div>
                 <div class="insight-list">
@@ -96,7 +96,7 @@
                     <div class="chat-item"><strong>3.</strong> Redirect to Manage Gyms list.</div>
                 </div>
             </article>
-        </div>
+        </div> -->
     </section>
 
     @include('admin::gym.partials.form')

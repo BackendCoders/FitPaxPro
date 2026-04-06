@@ -110,13 +110,13 @@
         <article class="surface-card hero-card">
             <span class="hero-kicker">Gym Operations</span>
             <h1 class="hero-title">Manage Gyms</h1>
-            <p style="max-width: 720px; color: rgba(248, 250, 252, 0.84);">
+            <!-- <p style="max-width: 720px; color: rgba(248, 250, 252, 0.84);">
                 View, edit, and delete gym records from the existing database table.
             </p>
 
             <div class="hero-actions" style="margin-top: 20px;">
                 <a class="primary-button" href="{{ route('admin.gym.create') }}">Create Gym</a>
-            </div>
+            </div> -->
         </article>
 
         <div class="side-stack">
