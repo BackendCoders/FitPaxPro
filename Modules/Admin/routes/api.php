@@ -23,5 +23,15 @@ Route::prefix('admin')->group(function () {
             Route::get('/gallery-media', 'AdminGymOperationsApiController@galleryMedia');
             Route::get('/reviews', 'AdminGymOperationsApiController@reviews');
         });
+
+        Route::prefix('user-operations')->group(function () {
+            Route::get('/users', 'AdminUserOperationsApiController@index');
+            Route::post('/users', 'AdminUserOperationsApiController@store');
+            Route::get('/users/{user}', 'AdminUserOperationsApiController@show');
+            Route::put('/users/{user}', 'AdminUserOperationsApiController@update');
+            Route::delete('/users/{user}', 'AdminUserOperationsApiController@destroy');
+            Route::post('/users/{user}/activate', 'AdminUserOperationsApiController@activate');
+            Route::post('/users/{user}/deactivate', 'AdminUserOperationsApiController@deactivate');
+        });
     });
 });

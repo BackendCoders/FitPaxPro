@@ -198,11 +198,20 @@ class AdminDashboardController extends Controller
                     ['label' => 'Add Gym', 'route' => 'admin.gym.create'],
                     ['label' => 'Manage Gyms', 'route' => 'admin.gym.index'],
                     ['label' => 'Membership Plans', 'route' => 'admin.gym.fee-plans'],
-                    ['label' => 'Trainers', 'route' => 'admin.dashboard'],
+                    ['label' => 'Trainers', 'route' => 'admin.gym.trainers'],
                     ['label' => 'Attendance / Bookings', 'route' => 'admin.gym.attendance'],
                     ['label' => 'Gym Enquiries', 'route' => 'admin.gym.enquiry'],
                     ['label' => 'Gallery Media', 'route' => 'admin.gym.gallery-media'],
                     ['label' => 'Gym Reviews', 'route' => 'admin.gym.reviews'],
+                ],
+            ],
+            [
+                'label' => 'User Operations',
+                'type' => 'dropdown',
+                'icon' => 'modules',
+                'items' => [
+                    ['label' => 'Manage Users', 'route' => 'admin.dashboard'],
+                    ['label' => 'User Operations API', 'route' => 'admin.dashboard'],
                 ],
             ],
             // [

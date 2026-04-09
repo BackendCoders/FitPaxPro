@@ -1,6 +1,6 @@
 @extends('admin::components.layouts.master')
 
-@section('title', 'Gym Enquiry | FitPaxPro')
+@section('title', 'Manage Trainers | FitPaxPro')
 
 @push('styles')
 <style>
@@ -73,6 +73,12 @@
         background: rgba(236, 253, 245, .86);
         color: #065f46;
     }
+
+    .alert-error {
+        border-color: rgba(185, 28, 28, .24);
+        background: rgba(254, 242, 242, .88);
+        color: #b91c1c;
+    }
 </style>
 @endpush
 
@@ -82,7 +88,7 @@
     <section class="page-hero">
         <article class="surface-card hero-card">
             <span class="hero-kicker">Gym Operations</span>
-            <h1 class="hero-title">Gym Enquiries</h1>
+            <h1 class="hero-title">Manage Trainers</h1>
         </article>
 
         <div class="side-stack">
@@ -90,8 +96,8 @@
                 <div class="section-title">Summary</div>
                 <div class="insight-list">
                     <div class="chat-item">
-                        <strong>{{ $enquiries->total() }}</strong>
-                        <div class="muted">Total enquiries</div>
+                        <strong>{{ $trainers->total() }}</strong>
+                        <div class="muted">Total trainers</div>
                     </div>
                 </div>
             </article>
@@ -103,22 +109,26 @@
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
 
+        @if (session('error'))
+            <div class="alert alert-error">{{ session('error') }}</div>
+        @endif
+
         <div class="table-wrap">
             <table class="gym-table">
                 <thead>
                     <tr>
-                        @foreach ($enquiryColumns as $column)
+                        @foreach ($trainerColumns as $column)
                             <th>{{ str_replace('_', ' ', $column) }}</th>
                         @endforeach
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($enquiries as $enquiry)
+                    @forelse ($trainers as $trainer)
                         <tr>
-                            @foreach ($enquiryColumns as $column)
+                            @foreach ($trainerColumns as $column)
                                 @php
-                                    $value = data_get($enquiry, $column);
+                                    $value = data_get($trainer, $column);
                                     $rendered = match (true) {
                                         is_null($value) => 'N/A',
                                         is_bool($value) => $value ? 'Yes' : 'No',
@@ -130,9 +140,8 @@
                             @endforeach
                             <td>
                                 <div class="action-row">
-                                    <a class="btn-mini" href="{{ route('admin.gym.enquiry.view', $enquiry) }}">View</a>
-                                    <a class="btn-mini" href="{{ route('admin.gym.enquiry.edit', $enquiry) }}">Edit</a>
-                                    <form method="POST" action="{{ route('admin.gym.enquiry.destroy', $enquiry) }}" onsubmit="return confirm('Delete this enquiry?');">
+                                    <a class="btn-mini" href="{{ route('admin.gym.trainers.edit', $trainer) }}">Edit</a>
+                                    <form method="POST" action="{{ route('admin.gym.trainers.destroy', $trainer) }}" onsubmit="return confirm('Delete this trainer?');">
                                         @csrf
                                         @method('DELETE')
                                         <button class="btn-mini danger" type="submit">Delete</button>
@@ -142,7 +151,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="{{ count($enquiryColumns) + 1 }}" class="muted" style="text-align:center; padding: 22px;">No enquiries found.</td>
+                            <td colspan="{{ count($trainerColumns) + 1 }}" class="muted" style="text-align:center; padding: 22px;">No trainers found.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -150,9 +159,10 @@
         </div>
 
         <div style="margin-top: 14px;">
-            {{ $enquiries->links() }}
+            {{ $trainers->links() }}
         </div>
     </section>
+
     </div>
 </div>
 @endsection
