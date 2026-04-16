@@ -41,6 +41,7 @@ class GYMServiceProvider extends ServiceProvider
     {
         $this->app->bind(AuthRepositoryInterface::class, AuthRepository::class);
         $this->app->register(RouteServiceProvider::class);
+        $this->app->register(GymRepositoryServiceProvider::class);
     }
 
     /**

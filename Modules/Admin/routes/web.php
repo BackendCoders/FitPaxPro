@@ -11,6 +11,11 @@
 |
 */
 
-Route::prefix('admin')->group(function() {
+Route::prefix('admin')->middleware(['auth'])->group(function() {
     Route::get('/', 'AdminController@index');
+    Route::get('/dashboard', 'DashboardController@index')->name('admin.dashboard');
+    
+    // Global Settings
+    Route::get('/settings', [Modules\Admin\app\Http\Controllers\SettingController::class, 'index'])->name('admin.settings.index');
+    Route::post('/settings', [Modules\Admin\app\Http\Controllers\SettingController::class, 'update'])->name('admin.settings.update');
 });

@@ -2,24 +2,30 @@
 
 namespace Modules\GYM\app\Http\Controllers;
 
-use Illuminate\Contracts\Support\Renderable;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
+use Modules\GYM\app\Interfaces\GymRepositoryInterface;
 
 class GYMController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     * @return Renderable
-     */
-    public function index()
+    private $gymRepository;
+
+    public function __construct(GymRepositoryInterface $gymRepository)
     {
-        return view('gym::index');
+        $this->gymRepository = $gymRepository;
     }
 
     /**
-     * Show the form for creating a new resource.
-     * @return Renderable
+     * Display a listing of gyms.
+     */
+    public function index()
+    {
+        $gyms = $this->gymRepository->getAllGyms();
+        return view('gym::index', compact('gyms'));
+    }
+
+    /**
+     * Show the form for creating a new gym.
      */
     public function create()
     {
@@ -27,53 +33,64 @@ class GYMController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     * @param Request $request
-     * @return Renderable
+     * Store a newly created gym in storage.
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:gyms,email',
+            'phone' => 'required|string|max:20',
+            'address' => 'required|string',
+            'member_count_limit' => 'nullable|integer',
+            'plans' => 'nullable|array',
+            'plans.*.name' => 'required|string',
+            'plans.*.price' => 'required|numeric',
+        ]);
+
+        // Note: For now, we'll assign the authenticated user as the owner or use a placeholder
+        $data = $request->all();
+        $data['owner_id'] = auth()->id(); 
+
+        $this->gymRepository->createGym($data);
+
+        return redirect()->route('gym.index')->with('success', 'Gym created successfully!');
     }
 
     /**
-     * Show the specified resource.
-     * @param int $id
-     * @return Renderable
+     * Show the form for editing the specified gym.
      */
-    public function show($id)
+    public function edit($uuid)
     {
-        return view('gym::show');
+        $gym = $this->gymRepository->getGymById($uuid);
+        return view('gym::edit', compact('gym'));
     }
 
     /**
-     * Show the form for editing the specified resource.
-     * @param int $id
-     * @return Renderable
+     * Update the specified gym in storage.
      */
-    public function edit($id)
+    public function update(Request $request, $uuid)
     {
-        return view('gym::edit');
+        $gym = $this->gymRepository->getGymById($uuid);
+        
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:gyms,email,' . $gym->id,
+            'phone' => 'required|string|max:20',
+            'address' => 'required|string',
+        ]);
+
+        $this->gymRepository->updateGym($uuid, $request->all());
+
+        return redirect()->route('gym.index')->with('success', 'Gym updated successfully!');
     }
 
     /**
-     * Update the specified resource in storage.
-     * @param Request $request
-     * @param int $id
-     * @return Renderable
+     * Remove the specified gym from storage.
      */
-    public function update(Request $request, $id)
+    public function destroy($uuid)
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     * @param int $id
-     * @return Renderable
-     */
-    public function destroy($id)
-    {
-        //
+        $this->gymRepository->deleteGym($uuid);
+        return redirect()->route('gym.index')->with('success', 'Gym deleted successfully!');
     }
 }

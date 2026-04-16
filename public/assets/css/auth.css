@@ -1,0 +1,197 @@
+/* Auth Pages Premium Styling - Split Screen Design */
+
+.auth-container {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f8fafc;
+}
+
+/* Left Side - Image Side */
+.auth-image-side {
+    flex: 1;
+    position: relative;
+    display: none;
+    overflow: hidden;
+    background-color: #0f172a;
+}
+
+@media (min-width: 992px) {
+    .auth-image-side {
+        display: block;
+    }
+}
+
+.auth-bg-img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.7;
+    filter: brightness(0.6) contrast(1.1);
+    transition: transform 0.8s ease;
+}
+
+.auth-image-side:hover .auth-bg-img {
+    transform: scale(1.05);
+}
+
+.auth-overlay-content {
+    position: absolute;
+    bottom: 80px;
+    left: 80px;
+    right: 80px;
+    z-index: 10;
+    color: white;
+}
+
+.auth-overlay-content h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 20px;
+    color: #ffffff;
+    text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.auth-overlay-content p {
+    font-size: 1.25rem;
+    color: rgba(255, 255, 255, 0.8);
+    max-width: 500px;
+}
+
+/* Right Side - Form Side */
+.auth-form-side {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    background: #ffffff;
+}
+
+@media (min-width: 992px) {
+    .auth-form-side {
+        flex: 0 0 550px;
+        background: #f8fafc;
+    }
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 420px;
+    padding: 40px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+}
+
+@media (max-width: 992px) {
+    .auth-card {
+        box-shadow: none;
+        padding: 0;
+    }
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.auth-logo {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+}
+
+.auth-header h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 8px;
+}
+
+.auth-header p {
+    color: #64748b;
+    font-size: 0.95rem;
+}
+
+/* Form Styles */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #475569;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    color: #1e293b;
+    transition: all 0.2s;
+    background: #ffffff;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+}
+
+.btn-auth {
+    width: 100%;
+    padding: 14px;
+    background: #6366f1;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 10px;
+}
+
+.btn-auth:hover {
+    background: #4f46e5;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.3);
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 0.9rem;
+    color: #64748b;
+}
+
+.auth-footer a {
+    color: #6366f1;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.auth-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Glassmorphism Accents */
+.glass-tag {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-block;
+    margin-bottom: 15px;
+}

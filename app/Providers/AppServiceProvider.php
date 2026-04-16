@@ -11,7 +11,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->register(RepositoryServiceProvider::class);
+        $this->app->singleton(\App\Services\SettingService::class);
     }
 
     /**
