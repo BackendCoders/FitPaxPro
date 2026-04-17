@@ -1,6 +1,6 @@
 @props(['title' => 'FitPaxPro'])
 <!doctype html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 
 <head>
     <meta charset="utf-8" />
@@ -11,10 +11,48 @@
 
     @include('layouts.common.styles-lib')
     @stack('styles-lib')
+
+    <style>
+        /* Industrial Toastr Overhaul - Forced Dark */
+        #toast-container > div.toast, 
+        .toast {
+            background-color: #121418 !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.8) !important;
+            border-radius: 14px !important;
+            opacity: 1 !important;
+            color: #ffffff !important;
+            padding: 16px 20px 16px 54px !important;
+            background-image: none !important; /* Remove default icons if they clash */
+        }
+        #toast-container > .toast-success, .toast-success { color: #00ff80 !important; border-left: 5px solid #00ff80 !important; }
+        #toast-container > .toast-error, .toast-error { color: #E11218 !important; border-left: 5px solid #E11218 !important; }
+        #toast-container > .toast-warning, .toast-warning { color: #ffc107 !important; border-left: 5px solid #ffc107 !important; }
+        
+        .toast-title { font-weight: 800 !important; color: #fff !important; margin-bottom: 4px !important; display: block; }
+        .toast-message { color: rgba(255,255,255,0.8) !important; font-size: 0.85rem !important; font-weight: 600 !important; }
+        
+        #toast-container .toast-progress { background-color: #E11218 !important; opacity: 0.5 !important; height: 3px !important; }
+
+        /* SweetAlert2 Industrial Dark Overhaul */
+        .swal2-popup {
+            background: #121418 !important;
+            border: 1px solid rgba(255,255,255,0.08) !important;
+            border-radius: 20px !important;
+            color: #fff !important;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8) !important;
+        }
+        .swal2-title { color: #fff !important; font-weight: 800 !important; font-family: 'Inter', sans-serif !important; }
+        .swal2-html-container { color: rgba(255,255,255,0.6) !important; font-size: 0.9rem !important; }
+        .swal2-confirm { background-color: #E11218 !important; border-radius: 12px !important; font-weight: 700 !important; text-transform: uppercase !important; letter-spacing: 1px !important; }
+        .swal2-cancel { background-color: #23282e !important; border-radius: 12px !important; font-weight: 700 !important; text-transform: uppercase !important; letter-spacing: 1px !important; }
+        .swal2-icon { border-color: rgba(255,255,255,0.1) !important; }
+    </style>
+
     @stack('styles')
 </head>
 
-<body data-menu-color="light" data-sidebar="default">
+<body data-menu-color="dark" data-sidebar="default" data-topbar-color="dark">
 
     <div id="app-layout">
 
@@ -82,13 +120,17 @@
                     const form = e.target;
 
                     Swal.fire({
-                        title: 'Are you sure?',
-                        text: "You won't be able to revert this!",
+                        title: 'Confirm Deletion',
+                        text: "This operation will permanently purge the record from the core mesh.",
                         icon: 'warning',
+                        iconColor: '#E11218',
                         showCancelButton: true,
-                        confirmButtonColor: '#d33',
-                        cancelButtonColor: '#3085d6',
-                        confirmButtonText: 'Yes, delete it!'
+                        confirmButtonColor: '#E11218',
+                        cancelButtonColor: '#23282e',
+                        confirmButtonText: 'PURGE RECORD',
+                        cancelButtonText: 'ABORT',
+                        background: '#121418',
+                        color: '#fff'
                     }).then((result) => {
                         if (result.isConfirmed) {
                             form.submit();

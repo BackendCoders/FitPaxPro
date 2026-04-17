@@ -17,6 +17,29 @@ class Gym extends Model
 
     protected $guarded = [];
 
+    /**
+     * Get the platform subscription plan for this gym.
+     */
+    public function platformPlan()
+    {
+        return $this->belongsTo(PlatformSubscriptionPlan::class, 'platform_plan_id');
+    }
+
+    protected static function booted()
+    {
+        static::saving(function ($gym) {
+            if (empty($gym->slug)) {
+                $gym->slug = \Illuminate\Support\Str::slug($gym->name);
+                
+                // Ensure uniqueness
+                $count = static::where('slug', 'like', $gym->slug . '%')->where('id', '!=', $gym->id)->count();
+                if ($count > 0) {
+                    $gym->slug .= '-' . ($count + 1);
+                }
+            }
+        });
+    }
+
     protected $casts = [
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
@@ -55,5 +78,10 @@ class Gym extends Model
     public function attendanceLogs(): HasMany
     {
         return $this->hasMany(AttendanceLog::class);
+    }
+
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(GymSubscription::class);
     }
 }

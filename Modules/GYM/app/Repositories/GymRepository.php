@@ -23,9 +23,9 @@ class GymRepository implements GymRepositoryInterface
      * @param string $uuid
      * @return \App\Models\Gym|null
      */
-    public function getGymById(string $uuid)
+    public function getGymById(string $id)
     {
-        return Gym::where('uuid', $uuid)->firstOrFail();
+        return Gym::where('id', $id)->firstOrFail();
     }
 
     /**
@@ -84,6 +84,91 @@ class GymRepository implements GymRepositoryInterface
         $gym = $this->getGymById($uuid);
         if ($gym) {
             return $gym->delete();
+        }
+        return false;
+    }
+
+    /**
+     * Get all gym subscriptions.
+     * 
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getAllSubscriptions()
+    {
+        return \App\Models\GymSubscription::with(['gym', 'user', 'plan'])->latest()->get();
+    }
+
+    /**
+     * Get a subscription by its ID.
+     * 
+     * @param string $id
+     * @return \App\Models\GymSubscription|null
+     */
+    public function getSubscriptionById(string $id)
+    {
+        return \App\Models\GymSubscription::where('id', $id)->firstOrFail();
+    }
+
+    /**
+     * Get all membership plans.
+     * 
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getAllPlans()
+    {
+        return \App\Models\GymFeePlan::with('gym')->latest()->get();
+    }
+
+    /**
+     * Get a plan by its ID.
+     * 
+     * @param string $id
+     * @return \App\Models\GymFeePlan|null
+     */
+    public function getPlanById(string $id)
+    {
+        return \App\Models\GymFeePlan::where('id', $id)->firstOrFail();
+    }
+
+    /**
+     * Create a new plan.
+     * 
+     * @param array $data
+     * @return \App\Models\GymFeePlan
+     */
+    public function createPlan(array $data)
+    {
+        return \App\Models\GymFeePlan::create($data);
+    }
+
+    /**
+     * Update an existing plan.
+     * 
+     * @param string $id
+     * @param array $data
+     * @return \App\Models\GymFeePlan|null
+     */
+    public function updatePlan(string $id, array $data)
+    {
+        $plan = $this->getPlanById($id);
+        if ($plan) {
+            $plan->update($data);
+            return $plan;
+        }
+        return null;
+    }
+
+    /**
+     * Delete a plan.
+     * 
+     * @param string $id
+     * @return bool
+     */
+    public function deletePlan(string $id)
+    {
+        $plan = $this->getPlanById($id);
+        if ($plan) {
+            return $plan->delete();
         }
         return false;
     }

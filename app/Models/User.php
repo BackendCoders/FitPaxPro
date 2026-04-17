@@ -152,4 +152,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(AdminWarning::class, 'user_id');
     }
+
+    public function gymSubscriptions(): HasMany
+    {
+        return $this->hasMany(GymSubscription::class);
+    }
 }

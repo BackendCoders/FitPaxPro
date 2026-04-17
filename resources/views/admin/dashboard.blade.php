@@ -3,50 +3,95 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts/dist/apexcharts.css">
         <style>
             :root {
-                --cc-bg: #f8fafc;
-                --cc-border: #e2e8f0;
-                --cc-primary: #4d0091;
+                --cc-bg: #111317;
+                --cc-border: rgba(255, 255, 255, 0.08);
+                --cc-primary: #E11218;
                 --cc-success: #10b981;
                 --cc-danger: #ef4444;
+                --cc-surface: rgba(255, 255, 255, 0.03);
+                --cc-text: #ffffff;
+                --cc-text-muted: rgba(255, 255, 255, 0.5);
             }
-            .content-page { padding: 15px !important; }
+            .content-page { padding: 20px !important; }
             .matrix-card {
-                background: white;
+                background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
                 border: 1px solid var(--cc-border);
-                border-radius: 8px;
-                padding: 12px;
-                transition: all 0.2s;
+                border-radius: 12px;
+                padding: 16px;
+                transition: transform 0.2s, box-shadow 0.2s;
+                position: relative;
+                overflow: hidden;
             }
-            .matrix-card h6 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; margin-bottom: 5px; font-weight: 700; }
-            .matrix-card h3 { font-size: 1.25rem; font-weight: 800; color: #1e293b; margin-bottom: 0; }
-            .matrix-card .trend { font-size: 0.7rem; font-weight: 600; }
+            .matrix-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+                border-color: rgba(225, 18, 24, 0.3);
+            }
+            .matrix-card h6 { 
+                font-size: 0.65rem; 
+                text-transform: uppercase; 
+                letter-spacing: 1px; 
+                color: var(--cc-text-muted); 
+                margin-bottom: 8px; 
+                font-weight: 600; 
+            }
+            .matrix-card h3 { 
+                font-size: 1.5rem; 
+                font-weight: 700; 
+                color: var(--cc-text); 
+                margin-bottom: 0; 
+                letter-spacing: -0.5px;
+            }
+            .matrix-card .trend { 
+                font-size: 0.7rem; 
+                font-weight: 700; 
+                padding: 2px 6px;
+                border-radius: 4px;
+                background: rgba(255,255,255,0.05);
+            }
             
             .pulse-container {
-                max-height: 380px;
+                max-height: 400px;
                 overflow-y: auto;
-                font-family: 'Inter', sans-serif;
+                scrollbar-width: thin;
             }
             .pulse-item {
-                padding: 10px;
-                border-bottom: 1px solid #f1f5f9;
-                font-size: 0.8rem;
-                display: flex;
-                gap: 12px;
+                padding: 12px 16px;
+                border-bottom: 1px solid var(--cc-border);
+                transition: background 0.2s;
             }
-            .pulse-time { color: #94a3b8; min-width: 60px; font-size: 0.75rem; }
-            .pulse-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+            .pulse-item:hover { background: rgba(255,255,255,0.02); }
+            .pulse-time { color: var(--cc-text-muted); font-size: 0.7rem; font-family: monospace; }
             
+            .nav-tabs-custom { border-bottom: 1px solid var(--cc-border) !important; padding: 0 10px; }
             .nav-tabs-custom .nav-link { 
-                font-size: 0.8rem; font-weight: 600; color: #64748b; border: none; padding: 10px 15px;
+                font-size: 0.75rem; font-weight: 500; color: var(--cc-text-muted); border: none; padding: 12px 16px; 
+                transition: all 0.3s;
             }
             .nav-tabs-custom .nav-link.active { 
-                color: var(--cc-primary); border-bottom: 2px solid var(--cc-primary); background: transparent;
+                color: var(--cc-primary); background: transparent; 
+                position: relative;
             }
-            .table-dense th { font-size: 0.7rem; text-transform: uppercase; color: #64748b; background: #f8fafc; }
-            .table-dense td { font-size: 0.8rem; padding: 8px 12px !important; vertical-align: middle; }
+            .nav-tabs-custom .nav-link.active::after {
+                content: ""; position: absolute; bottom: 0; left: 0; width: 100%; height: 2px; background: var(--cc-primary);
+            }
+            .table-dense th { 
+                font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px;
+                color: var(--cc-text-muted); padding: 12px 16px !important;
+                background: rgba(255,255,255,0.02);
+            }
+            .table-dense td { font-size: 0.8rem; padding: 12px 16px !important; color: rgba(255,255,255,0.8); }
             
-            .sparkline-container { width: 60px; height: 30px; }
-            .status-indicator { display: inline-flex; align-items: center; gap: 5px; font-size: 0.7rem; font-weight: 600; }
+            .text-muted { color: var(--cc-text-muted) !important; }
+            .premium-status {
+                display: inline-flex;
+                align-items: center;
+                padding: 2px 8px;
+                border-radius: 20px;
+                font-size: 0.7rem;
+                background: rgba(16, 185, 129, 0.1);
+                color: var(--cc-success);
+            }
         </style>
     @endpush
 
@@ -111,11 +156,11 @@
     <!-- Middle Pane: Analytics & Live Pulse -->
     <div class="row g-3 mb-3">
         <div class="col-xl-8">
-            <div class="card border-1 shadow-none rounded-3" style="border: 1px solid #e2e8f0;">
-                <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
+            <div class="card border-1 shadow-none rounded-3" style="border: 1px solid var(--cc-border);">
+                <div class="card-header bg-transparent py-3 border-0 d-flex justify-content-between align-items-center">
                     <h6 class="mb-0 fw-bold">Analytics Hub <small class="text-muted ms-2">Real-time engagement trends</small></h6>
                     <div class="d-flex gap-2">
-                        <button class="btn btn-xs btn-outline-light border text-dark fs-11 px-2 py-1">Export PDF</button>
+                        <button class="btn btn-xs btn-outline-secondary fs-11 px-2 py-1">Export PDF</button>
                     </div>
                 </div>
                 <div class="card-body">
@@ -124,8 +169,8 @@
             </div>
         </div>
         <div class="col-xl-4">
-            <div class="card border-1 shadow-none rounded-3" style="border: 1px solid #e2e8f0;">
-                <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
+            <div class="card border-1 shadow-none rounded-3" style="border: 1px solid var(--cc-border);">
+                <div class="card-header bg-transparent py-3 border-0 d-flex justify-content-between align-items-center">
                     <h6 class="mb-0 fw-bold">Live Pulse <span class="badge bg-success-subtle text-success ms-2 fs-10">Live</span></h6>
                 </div>
                 <div class="card-body p-0">
@@ -169,8 +214,8 @@
     <!-- Bottom Pane: Advanced Tables -->
     <div class="row g-3">
         <div class="col-12">
-            <div class="card border-1 shadow-none rounded-3" style="border: 1px solid #e2e8f0;">
-                <div class="card-header bg-white p-0 border-0">
+            <div class="card border-1 shadow-none rounded-3" style="border: 1px solid var(--cc-border);">
+                <div class="card-header bg-transparent p-0 border-0">
                     <ul class="nav nav-tabs nav-tabs-custom border-bottom" role="tablist">
                         <li class="nav-item">
                             <a class="nav-link active" data-bs-toggle="tab" href="#members-tab" role="tab">Active Members</a>
@@ -208,7 +253,7 @@
                                                 </div>
                                             </td>
                                             <td>{{ $user['email'] }}</td>
-                                            <td><span class="status-indicator text-success"><iconify-icon icon="tabler:circle-filled"></iconify-icon> Online</span></td>
+                                            <td><span class="premium-status"><iconify-icon icon="tabler:circle-filled" class="me-1 fs-8"></iconify-icon> Online</span></td>
                                             <td><small class="text-muted">Last check-in: {{ \Carbon\Carbon::parse($user['created_at'])->format('H:i') }}</small></td>
                                             <td class="text-end">
                                                 <div class="btn-group btn-group-sm">
@@ -277,11 +322,17 @@
                 }],
                 chart: { height: 320, type: 'area', toolbar: { show: false }, zoom: { enabled: false } },
                 dataLabels: { enabled: false },
-                stroke: { curve: 'smooth', width: 2 },
-                colors: ['#4d0091', '#10b981'],
-                fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.2, opacityTo: 0.05, stops: [0, 90, 100] } },
-                xaxis: { categories: ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"] },
-                grid: { borderColor: '#f1f5f9' },
+                stroke: { curve: 'smooth', width: 1.5 },
+                colors: ['#E11218', '#10b981'],
+                fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.1, opacityTo: 0.01, stops: [0, 90, 100] } },
+                xaxis: { 
+                    categories: ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"],
+                    axisBorder: { show: false },
+                    axisTicks: { show: false },
+                    labels: { style: { colors: 'rgba(255,255,255,0.4)', fontSize: '10px' } }
+                },
+                grid: { borderColor: 'rgba(255,255,255,0.03)', strokeDashArray: 4 },
+                theme: { mode: 'dark' },
                 tooltip: { theme: 'dark' }
             };
             var chart = new ApexCharts(document.querySelector("#command-center-chart"), options);

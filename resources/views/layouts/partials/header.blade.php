@@ -5,7 +5,7 @@
                 <li>
                     <button type="button" class="button-toggle-menu nav-link btnlefsidedesk">
                         <iconify-icon icon="tabler:align-left"
-                            class="fs-20 align-middle text-dark topbar-button"></iconify-icon>
+                            class="fs-20 align-middle topbar-button"></iconify-icon>
                     </button>
                 </li>
             </ul>
@@ -17,7 +17,7 @@
                         <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button"
                             aria-haspopup="false" aria-expanded="false">
                             <iconify-icon icon="tabler:bell"
-                                class="fs-20 text-dark align-middle topbar-button"></iconify-icon>
+                                class="fs-20 align-middle topbar-button"></iconify-icon>
 
                             <span
                                 class="badge bg-danger rounded-circle noti-icon-badge {{ auth()->user()->unreadNotifications->count() > 0 ? '' : 'd-none' }}"
@@ -31,9 +31,9 @@
                                 <h5 class="m-0 fs-16">
                                     <span class="float-end">
                                         <a href="{{ Route::has('notifications.markAsRead') ? route('notifications.markAsRead') : '#' }}"
-                                            class="text-dark">
+                                            class="text-light">
                                             <small><iconify-icon icon="tabler:checks"
-                                                    class="fs-18 text-dark align-middle"></iconify-icon> Mark all
+                                                    class="fs-18 align-middle"></iconify-icon> Mark all
                                                 read</small>
                                         </a>
                                     </span>
@@ -71,7 +71,7 @@
                             </div>
 
                             <a href="javascript:void(0);" id="view-all-notifications"
-                                class="dropdown-item text-center text-dark notify-item notify-all bg-light">
+                                class="dropdown-item text-center text-light notify-item notify-all bg-dark">
                                 View all <i data-lucide="arrow-right"></i>
                             </a>
                         </div>

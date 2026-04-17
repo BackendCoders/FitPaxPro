@@ -43,4 +43,59 @@ interface GymRepositoryInterface
      * @return bool
      */
     public function deleteGym(string $uuid);
+
+    /**
+     * Get all gym subscriptions.
+     * 
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getAllSubscriptions();
+
+    /**
+     * Get a subscription by its ID.
+     * 
+     * @param string $id
+     * @return \App\Models\GymSubscription|null
+     */
+    public function getSubscriptionById(string $id);
+
+    /**
+     * Get all membership plans.
+     * 
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getAllPlans();
+
+    /**
+     * Get a plan by its ID.
+     * 
+     * @param string $id
+     * @return \App\Models\GymFeePlan|null
+     */
+    public function getPlanById(string $id);
+
+    /**
+     * Create a new plan.
+     * 
+     * @param array $data
+     * @return \App\Models\GymFeePlan
+     */
+    public function createPlan(array $data);
+
+    /**
+     * Update an existing plan.
+     * 
+     * @param string $id
+     * @param array $data
+     * @return \App\Models\GymFeePlan|null
+     */
+    public function updatePlan(string $id, array $data);
+
+    /**
+     * Delete a plan.
+     * 
+     * @param string $id
+     * @return bool
+     */
+    public function deletePlan(string $id);
 }
