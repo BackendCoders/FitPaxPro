@@ -121,6 +121,8 @@
                             </div>
                         </div>
                     </div>
+
+                    <x-dynamic-fields model-type="App\Models\Gym" :model="$gym" />
                 </div>
 
                 <div class="col-lg-5">

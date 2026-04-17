@@ -198,6 +198,9 @@
                         </div>
                     </div>
 
+                    <!-- Dynamic Extended Data -->
+                    <x-dynamic-fields model-type="App\Models\MembershipPlanTemplate" />
+
                     <!-- Advanced Tactical Modules -->
                     <div class="plan-card">
                         <div class="plan-card-header">

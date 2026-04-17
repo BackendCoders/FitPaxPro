@@ -97,7 +97,7 @@
     </script>
 
     <script>
-        @if (session('success') || session('error'))
+        @if (session('success') || session('error') || $errors->any())
             toastr.options = {
                 "closeButton": true,
                 "progressBar": true,
@@ -109,6 +109,11 @@
             @endif
             @if (session('error'))
                 toastr.error("{{ session('error') }}");
+            @endif
+            @if ($errors->any())
+                @foreach ($errors->all() as $error)
+                    toastr.error("{{ $error }}");
+                @endforeach
             @endif
         @endif
 

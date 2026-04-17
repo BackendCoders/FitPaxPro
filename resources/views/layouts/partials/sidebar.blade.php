@@ -183,6 +183,16 @@
                 <li class="menu-title">Control Panel</li>
 
                 <li>
+                    <a href="{{ route('admin.custom-fields.index') }}"
+                        class="tp-link {{ request()->routeIs('admin.custom-fields.*') ? 'active' : '' }}">
+                        <span class="nav-icon text-white">
+                            <iconify-icon icon="tabler:database-cog"></iconify-icon>
+                        </span>
+                        <span class="sidebar-text"> Dynamic Fields </span>
+                    </a>
+                </li>
+
+                <li>
                     <a href="{{ route('admin.settings.index') }}"
                         class="tp-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
                         <span class="nav-icon text-white">

@@ -64,7 +64,7 @@ class GYMController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $rules = [
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:gyms,email',
             'phone' => 'required|string|max:20',
@@ -76,7 +76,10 @@ class GYMController extends Controller
             'custom_plans' => 'nullable|array',
             'custom_plans.*.name' => 'required|string',
             'custom_plans.*.price' => 'required|numeric',
-        ]);
+        ];
+
+        $dynamicRules = \App\Models\Gym::getCustomFieldRules(\App\Models\Gym::class);
+        $request->validate(array_merge($rules, $dynamicRules));
 
         $data = $request->except(['template_ids', 'custom_plans']);
         $data['owner_id'] = auth()->id(); 
@@ -138,6 +141,10 @@ class GYMController extends Controller
             }
         }
 
+        if ($request->has('custom_fields')) {
+            $gym->saveCustomFields($request->custom_fields);
+        }
+
         return redirect()->route('gym.index')->with('success', 'Gym created successfully with selected plans!');
     }
 
@@ -194,14 +201,21 @@ class GYMController extends Controller
     {
         $gym = $this->gymRepository->getGymById($uuid);
         
-        $request->validate([
+        $rules = [
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:gyms,email,' . $gym->id,
             'phone' => 'required|string|max:20',
             'address' => 'required|string',
-        ]);
+        ];
+
+        $dynamicRules = \App\Models\Gym::getCustomFieldRules(\App\Models\Gym::class);
+        $request->validate(array_merge($rules, $dynamicRules));
 
         $this->gymRepository->updateGym($uuid, $request->all());
+
+        if ($request->has('custom_fields')) {
+            $gym->saveCustomFields($request->custom_fields);
+        }
 
         return redirect()->route('gym.index')->with('success', 'Gym updated successfully!');
     }

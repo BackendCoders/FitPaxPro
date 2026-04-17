@@ -18,4 +18,8 @@ Route::prefix('admin')->middleware(['auth'])->group(function() {
     // Global Settings
     Route::get('/settings', [Modules\Admin\app\Http\Controllers\SettingController::class, 'index'])->name('admin.settings.index');
     Route::post('/settings', [Modules\Admin\app\Http\Controllers\SettingController::class, 'update'])->name('admin.settings.update');
+
+    // Dynamic Custom Fields
+    Route::post('custom-fields/{custom_field}/toggle-status', [Modules\Admin\app\Http\Controllers\CustomFieldController::class, 'toggleStatus'])->name('admin.custom-fields.toggle-status');
+    Route::resource('custom-fields', Modules\Admin\app\Http\Controllers\CustomFieldController::class)->names('admin.custom-fields');
 });

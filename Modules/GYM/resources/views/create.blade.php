@@ -193,6 +193,8 @@
                             </div>
                         </div>
                     </div>
+
+                    <x-dynamic-fields model-type="App\Models\Gym" />
                 </div>
 
                 <!-- Column 2: Subscription & Plans -->

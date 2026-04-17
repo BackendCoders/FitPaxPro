@@ -117,6 +117,8 @@
                                     </div>
                                 </div>
 
+                                <x-dynamic-fields model-type="App\Models\MembershipPlanTemplate" :model="$plan" />
+
                                 <div class="d-grid pt-2">
                                     <button type="submit" class="btn btn-primary py-2 fs-15 fw-bold shadow-none">
                                         Update Membership Plan

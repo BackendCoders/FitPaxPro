@@ -30,14 +30,17 @@ class PlanController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $rules = [
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
             'offer_price' => 'nullable|numeric|min:0',
             'duration_months' => 'required|integer|min:1',
             'includes_diet_plan' => 'boolean',
             'includes_trainer' => 'boolean',
-        ]);
+        ];
+
+        $dynamicRules = MembershipPlanTemplate::getCustomFieldRules(MembershipPlanTemplate::class);
+        $request->validate(array_merge($rules, $dynamicRules));
 
         $data = $request->except(['features_list']);
         $data['includes_diet_plan'] = $request->has('includes_diet_plan');
@@ -47,7 +50,11 @@ class PlanController extends Controller
             $data['features'] = array_filter(explode("\n", str_replace("\r", "", $request->features_list)));
         }
 
-        MembershipPlanTemplate::create($data);
+        $plan = MembershipPlanTemplate::create($data);
+        
+        if ($request->has('custom_fields')) {
+            $plan->saveCustomFields($request->custom_fields);
+        }
 
         return redirect()->route('gym.plans.index')->with('success', 'Global membership plan created successfully!');
     }
@@ -66,16 +73,19 @@ class PlanController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $request->validate([
+        $rules = [
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
             'offer_price' => 'nullable|numeric|min:0',
             'duration_months' => 'required|integer|min:1',
-        ]);
+        ];
+
+        $dynamicRules = MembershipPlanTemplate::getCustomFieldRules(MembershipPlanTemplate::class);
+        $request->validate(array_merge($rules, $dynamicRules));
 
         $plan = MembershipPlanTemplate::findOrFail($id);
         
-        $data = $request->except(['features_list']);
+        $data = $request->except(['features_list', 'custom_fields']);
         $data['includes_diet_plan'] = $request->has('includes_diet_plan');
         $data['includes_trainer'] = $request->has('includes_trainer');
 
@@ -84,6 +94,10 @@ class PlanController extends Controller
         }
 
         $plan->update($data);
+
+        if ($request->has('custom_fields')) {
+            $plan->saveCustomFields($request->custom_fields);
+        }
 
         return redirect()->route('gym.plans.index')->with('success', 'Global membership plan updated successfully!');
     }
