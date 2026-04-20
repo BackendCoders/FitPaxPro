@@ -4,9 +4,9 @@
         .gym-card { 
             background: #16191d; border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; 
             overflow: hidden; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); height: 100%;
-            display: flex; flex-direction: column;
+            display: flex; flex-direction: column; cursor: pointer;
         }
-        .gym-card:hover { transform: translateY(-5px); border-color: var(--rich-red); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .gym-card:hover { transform: translateY(-5px); border-color: #E11218; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
         
         .gym-cover { position: relative; height: 180px; width: 100%; overflow: hidden; }
         .gym-cover img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
@@ -27,9 +27,34 @@
         
         .gym-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: auto; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); }
         .meta-item { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; color: rgba(255,255,255,0.6); }
-        .meta-item iconify-icon { color: var(--rich-red); font-size: 1rem; }
+        .meta-item iconify-icon { color: #E11218; font-size: 1rem; }
 
         .gym-footer { padding: 15px 20px; background: rgba(0,0,0,0.2); display: flex; justify-content: space-between; align-items: center; }
+
+        .grayscale { filter: grayscale(1); }
+        .opacity-50 { opacity: 0.5; }
+
+        /* Command Modal Styles */
+        .command-modal .modal-content { background: #0f1115; border: 1px solid rgba(255,255,255,0.05); border-radius: 24px; overflow: hidden; }
+        .command-header { background: linear-gradient(135deg, #E11218 0%, #9a0d11 100%); padding: 30px; color: #fff; }
+        .command-node-info { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; opacity: 0.6; }
+        
+        .action-button { 
+            background: #16191d; border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; 
+            padding: 20px; transition: 0.3s; text-align: left; height: 100%; display: block;
+            text-decoration: none !important;
+        }
+        .action-button:hover { background: rgba(255,255,255,0.02); border-color: #E11218; transform: scale(1.02); }
+        .action-button iconify-icon { font-size: 24px; color: #E11218; margin-bottom: 12px; display: block; }
+        .action-button h6 { color: #fff; font-weight: 700; margin-bottom: 4px; font-size: 14px; }
+        .action-button p { color: rgba(255,255,255,0.4); font-size: 11px; margin-bottom: 0; }
+
+        .btn-command-trigger { 
+            background: #E11218; color: #fff; width: 32px; height: 32px; 
+            border-radius: 8px; display: flex; align-items: center; justify-content: center;
+            border: none; transition: 0.3s;
+        }
+        .btn-command-trigger:hover { background: #fff; color: #E11218; transform: rotate(90deg); }
     </style>
     @endpush
 
@@ -45,8 +70,8 @@
         </div>
     </div>
 
-    <!-- Filter Bar (CC Dark Style) -->
-    <div class="cc-card p-3 mb-4">
+    <!-- Filter Bar -->
+    <div class="cc-card p-3 mb-4" style="background: #16191d; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05);">
         <form action="{{ route('gym.index') }}" method="GET" class="row g-2 align-items-end">
             <div class="col-lg-4">
                 <label class="form-label fs-10 fw-bold text-muted mb-1">GLOBAL SEARCH</label>
@@ -58,9 +83,11 @@
             <div class="col-lg-2">
                 <label class="form-label fs-10 fw-bold text-muted mb-1">STATUS</label>
                 <select name="status" class="form-select bg-dark border-0 text-white shadow-none fs-13">
-                    <option value="">Full Network</option>
+                    <option value="">All Systems</option>
+                    <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active Nodes</option>
+                    <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Offline/Inactive</option>
+                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending Protocol</option>
                     <option value="verified" {{ request('status') == 'verified' ? 'selected' : '' }}>Verified Nodes</option>
-                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending Approval</option>
                 </select>
             </div>
             <div class="col-lg-2">
@@ -87,8 +114,8 @@
     <div class="row g-4">
         @forelse($gyms as $gym)
         <div class="col-xl-3 col-lg-4 col-md-6">
-            <div class="gym-card">
-                <div class="gym-cover">
+            <div class="gym-card" onclick="openCommandCenter('{{ $gym->id }}', '{{ $gym->name }}', '{{ $gym->address }}', '{{ $gym->status }}')">
+                <div class="gym-cover {{ $gym->status == 'inactive' ? 'opacity-50 grayscale' : '' }}">
                     <img src="{{ $gym->image ? asset('storage/' . $gym->image) : 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1200' }}" alt="{{ $gym->name }}">
                     <div class="gym-overlay">
                         <div class="d-flex gap-1">
@@ -98,24 +125,13 @@
                             @if($gym->is_sponsored)
                                 <span class="gym-badge text-warning"><iconify-icon icon="tabler:star-filled" class="me-1"></iconify-icon>PROMOTED</span>
                             @endif
+                            @if($gym->status == 'inactive')
+                                <span class="gym-badge text-danger"><iconify-icon icon="tabler:plug-off" class="me-1"></iconify-icon>OFFLINE</span>
+                            @endif
                         </div>
-                        <div class="dropdown">
-                            <button class="btn btn-dark p-1 rounded-circle border-0 shadow-lg" data-bs-toggle="dropdown" style="background: rgba(0,0,0,0.5); width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">
-                                <iconify-icon icon="tabler:dots-vertical" class="text-white fs-14"></iconify-icon>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark border-0 shadow-lg">
-                                <li><a class="dropdown-item" href="{{ route('gym.edit', $gym->id) }}"><iconify-icon icon="tabler:edit" class="me-2"></iconify-icon>Edit Node</a></li>
-                                <li><a class="dropdown-item" href="{{ route('gym.media', $gym->id) }}"><iconify-icon icon="tabler:photo" class="me-2"></iconify-icon>Gallery Settings</a></li>
-                                <li><a class="dropdown-item" href="{{ route('gym.analytics', $gym->id) }}"><iconify-icon icon="tabler:chart-bar" class="me-2"></iconify-icon>Performance Analytics</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <form action="{{ route('gym.destroy', $gym->id) }}" method="POST" onsubmit="return confirm('Immediately deactivate this location?')">
-                                        @csrf @method('DELETE')
-                                        <button class="dropdown-item text-danger"><iconify-icon icon="tabler:trash" class="me-2"></iconify-icon>Delete Location</button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </div>
+                        <button class="btn-command-trigger" onclick="event.stopPropagation(); openCommandCenter('{{ $gym->id }}', '{{ $gym->name }}', '{{ $gym->address }}', '{{ $gym->status }}')">
+                            <iconify-icon icon="tabler:bolt"></iconify-icon>
+                        </button>
                     </div>
                 </div>
                 
@@ -148,7 +164,7 @@
                         <img src="https://ui-avatars.com/api/?name={{ urlencode($gym->owner->name ?? 'N') }}&background=E11218&color=fff" class="rounded-circle me-2" style="width: 20px; height: 20px;">
                         <span class="fs-11 text-white-50">{{ Str::words($gym->owner->name ?? 'Admin', 1, '') }}</span>
                     </div>
-                    <a href="{{ route('gym.analytics', $gym->id) }}" class="btn btn-link p-0 text-white-50 text-decoration-none fs-11 fw-bold">ANALYTICS <iconify-icon icon="tabler:chevron-right" class="ms-1 align-middle"></iconify-icon></a>
+                    <span class="fs-10 fw-bold text-white-30 uppercase letter-spacing-1">Node Status: Active</span>
                 </div>
             </div>
         </div>
@@ -163,4 +179,106 @@
         </div>
         @endforelse
     </div>
+
+    <div class="mt-5 d-flex justify-content-center">
+        {{ $gyms->links() }}
+    </div>
+
+    <!-- Command Center Modal -->
+    <div class="modal fade command-modal" id="gymCommandCenter" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content shadow-2xl">
+                <div class="command-header">
+                    <div class="d-flex justify-content-between align-items-start mb-4">
+                        <div>
+                            <p class="command-node-info mb-1" id="m-gym-node">Node Serial: a19048d0</p>
+                            <h3 class="fw-900 text-white mb-1" id="m-gym-name">Iron Force Elite</h3>
+                            <p class="text-white-50 fs-13 mb-0" id="m-gym-address">123 Tactical Street, Gym District</p>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <span class="badge bg-white bg-opacity-20 rounded-pill px-3 py-2 fs-10 fw-bold uppercase">Operational Status: Online</span>
+                        <span class="badge bg-white bg-opacity-20 rounded-pill px-3 py-2 fs-10 fw-bold uppercase" id="m-gym-tag">Verified node</span>
+                    </div>
+                </div>
+                <div class="modal-body p-4 p-lg-5">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <a href="#" id="link-edit" class="action-button">
+                                <iconify-icon icon="tabler:adjustments-horizontal"></iconify-icon>
+                                <h6>Configuration Edit</h6>
+                                <p>Tune location parameters, metadata, and commercial details.</p>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="#" id="link-members" class="action-button">
+                                <iconify-icon icon="tabler:users-group"></iconify-icon>
+                                <h6>Member Manifest</h6>
+                                <p>Access active operative directory and subscriber intelligence.</p>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="#" id="link-gallery" class="action-button">
+                                <iconify-icon icon="tabler:photo-up"></iconify-icon>
+                                <h6>Media Assets Hub</h6>
+                                <p>Manage location portfolio, gallery, and primary visual assets.</p>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="#" id="link-analytics" class="action-button">
+                                <iconify-icon icon="tabler:brand-google-analytics"></iconify-icon>
+                                <h6>Tactical Analytics</h6>
+                                <p>Visual performance metrics, revenue trends, and growth logs.</p>
+                            </a>
+                        </div>
+                        <div class="col-12 mt-4 pt-4 border-top border-secondary border-opacity-10">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-white mb-1">Operational Transmission</h6>
+                                    <p class="text-white-50 fs-11 mb-0">Toggle visibility and signal availability for this node.</p>
+                                </div>
+                                <form action="#" id="form-toggle-status" method="POST">
+                                    @csrf
+                                    <button class="btn btn-outline-warning px-4 py-2 fs-11 fw-bold rounded-3" id="btn-status-toggle">TOGGLE SIGNAL</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @push('scripts')
+    <script>
+        function openCommandCenter(id, name, address, currentStatus) {
+            const modal = new bootstrap.Modal(document.getElementById('gymCommandCenter'));
+            
+            // Populate Modal Data
+            document.getElementById('m-gym-node').innerText = 'Node Identifier: ' + id.substring(0, 8);
+            document.getElementById('m-gym-name').innerText = name;
+            document.getElementById('m-gym-address').innerText = address;
+            
+            // Update Links
+            document.getElementById('link-edit').href = `/gym/${id}/edit`;
+            document.getElementById('link-members').href = `/gym/${id}/members`;
+            document.getElementById('link-gallery').href = `/gym/${id}/media`;
+            document.getElementById('link-analytics').href = `/gym/${id}/analytics`;
+            
+            // Update Toggle Form
+            document.getElementById('form-toggle-status').action = `/gym/${id}/toggle-status`;
+            const btnToggle = document.getElementById('btn-status-toggle');
+            if (currentStatus === 'inactive') {
+                btnToggle.innerText = 'INITIALIZE SIGNAL (ACTIVATE)';
+                btnToggle.className = 'btn btn-outline-success px-4 py-2 fs-11 fw-bold rounded-3';
+            } else {
+                btnToggle.innerText = 'TERMINATE SIGNAL (INACTIVATE)';
+                btnToggle.className = 'btn btn-outline-danger px-4 py-2 fs-11 fw-bold rounded-3';
+            }
+            
+            modal.show();
+        }
+    </script>
+    @endpush
 </x-app-layout>

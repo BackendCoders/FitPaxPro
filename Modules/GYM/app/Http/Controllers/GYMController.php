@@ -32,7 +32,11 @@ class GYMController extends Controller
         }
 
         if ($request->filled('status')) {
-            $query->where('is_verified', $request->status == 'verified');
+            if ($request->status == 'verified') {
+                $query->where('is_verified', true);
+            } else {
+                $query->where('status', $request->status);
+            }
         }
 
         if ($request->filled('sponsored')) {
@@ -43,7 +47,7 @@ class GYMController extends Controller
             $query->where('platform_plan_id', $request->plan_id);
         }
 
-        $gyms = $query->get();
+        $gyms = $query->paginate(12)->withQueryString();
         $platformPlans = \App\Models\PlatformSubscriptionPlan::all();
         
         return view('gym::index', compact('gyms', 'platformPlans'));
@@ -207,6 +211,16 @@ class GYMController extends Controller
     }
 
     /**
+     * Show members (subscribers) for a gym.
+     */
+    public function members($uuid)
+    {
+        $gym = $this->gymRepository->getGymById($uuid);
+        $members = $gym->subscriptions()->with(['user.roles', 'feePlan'])->latest()->paginate(20);
+        return view('gym::members', compact('gym', 'members'));
+    }
+
+    /**
      * Update media for a gym.
      */
     public function updateMedia(Request $request, $uuid)
@@ -288,11 +302,14 @@ class GYMController extends Controller
     }
 
     /**
-     * Remove the specified gym from storage.
+     * Toggle the operational status of a gym.
      */
-    public function destroy($uuid)
+    public function toggleStatus($uuid)
     {
-        $this->gymRepository->deleteGym($uuid);
-        return redirect()->route('gym.index')->with('success', 'Gym deleted successfully!');
+        $gym = $this->gymRepository->getGymById($uuid);
+        $gym->status = ($gym->status == 'active') ? 'inactive' : 'active';
+        $gym->save();
+
+        return back()->with('success', 'Operational focus ' . strtoupper($gym->status) . ' for ' . $gym->name);
     }
 }

@@ -137,6 +137,16 @@
                 <li class="menu-title">Infrastructure</li>
 
                 <li>
+                    <a href="{{ route('users.index') }}"
+                        class="tp-link {{ request()->is('users*') ? 'active' : '' }}">
+                        <span class="nav-icon text-white">
+                            <iconify-icon icon="tabler:users"></iconify-icon>
+                        </span>
+                        <span class="sidebar-text"> Operative Directory </span>
+                    </a>
+                </li>
+
+                <li>
                     <a href="#sidebarGym" data-bs-toggle="collapse"
                         class="tp-link {{ request()->is('gym*') && !request()->routeIs('gym.plans.*') && !request()->routeIs('gym.subscriptions.*') ? 'active' : '' }}">
                         <span class="nav-icon text-white">
