@@ -101,6 +101,8 @@ class GYMController extends Controller
                     'file_path' => $path,
                     'file_type' => 'image',
                     'file_size' => $file->getSize(),
+                    'file_name' => $file->getClientOriginalName(),
+                    'mime_type' => $file->getClientMimeType(),
                 ]);
             }
         }
@@ -178,6 +180,8 @@ class GYMController extends Controller
                     'file_path' => $path,
                     'file_type' => 'image',
                     'file_size' => $file->getSize(),
+                    'file_name' => $file->getClientOriginalName(),
+                    'mime_type' => $file->getClientMimeType(),
                 ]);
             }
         }
