@@ -270,6 +270,36 @@ class GymController extends Controller
     }
 
     /**
+     * Retrieve custom field blueprints for the Gym model.
+     *
+     * @OA\Get(
+     *     path="/gym/custom-fields",
+     *     tags={"Gym Infrastructure"},
+     *     summary="Retrieve dynamic metadata blueprints",
+     *     description="Returns all active custom field definitions configured for the Gym infrastructure model.",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Dynamic fields retrieved",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="array", @OA\Items(type="object"))
+     *         )
+     *     )
+     * )
+     */
+    public function getCustomFields(): JsonResponse
+    {
+        $fields = \App\Models\CustomField::where('model_type', \App\Models\Gym::class)
+            ->where('is_active', true)
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $fields
+        ]);
+    }
+
+    /**
      * Get details of a specific gym node.
      *
      * @OA\Get(

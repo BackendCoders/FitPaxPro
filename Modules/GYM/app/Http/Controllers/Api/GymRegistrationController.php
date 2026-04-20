@@ -22,13 +22,13 @@ class GymRegistrationController extends Controller
      *     path="/gym/registration/step-1",
      *     tags={"Gym App: Provisions"},
      *     summary="Step 1: Operative Identity",
-     *     @OA\RequestBody(required=true, @OA\JsonContent(required={"name","email","phone","password"}, @OA\Property(property="name", type="string"), @OA\Property(property="email", type="string"), @OA\Property(property="phone", type="string"), @OA\Property(property="password", type="string"))),
+     *     @OA\RequestBody(required=true, @OA\JsonContent(required={"name","email","phone"}, @OA\Property(property="name", type="string"), @OA\Property(property="email", type="string"), @OA\Property(property="phone", type="string"))),
      *     @OA\Response(response=200, description="Identity captured")
      * )
      */
     public function step1(Request $request): JsonResponse
     {
-        $request->validate(['name' => 'required','email' => 'required|email|unique:users,email','phone' => 'required|unique:users,phone','password' => 'required|min:8']);
+        $request->validate(['name' => 'required','email' => 'required|email|unique:users,email','phone' => 'required|unique:users,phone']);
 
         try {
             DB::beginTransaction();

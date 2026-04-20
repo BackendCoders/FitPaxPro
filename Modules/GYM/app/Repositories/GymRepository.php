@@ -183,7 +183,7 @@ class GymRepository implements GymRepositoryInterface
             'name' => $data['name'],
             'email' => $data['email'],
             'phone' => $data['phone'],
-            'password' => $data['password'],
+            'password' => $data['password'] ?? \Str::random(16),
             'user_type' => 2, // Gym Owner
             'status' => 0
         ]);

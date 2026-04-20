@@ -10,5 +10,9 @@ interface AuthRepositoryInterface
 
     public function login(array $data): array;
 
+    public function sendOtp(string $emailOrPhone): string;
+
+    public function verifyLoginOtp(string $emailOrPhone, string $otp): array;
+
     public function formatUser(User $user): array;
 }

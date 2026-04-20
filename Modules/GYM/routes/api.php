@@ -16,6 +16,7 @@ Route::prefix('gym')->group(function () {
     // Identity Protocols
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
+    Route::post('login/verify', [AuthController::class, 'verifyLogin']);
 
     // THE 5-STEP INFRASTRUCTURE PROVISIONING PROTOCOL
     Route::prefix('registration')->group(function () {
@@ -31,6 +32,9 @@ Route::prefix('gym')->group(function () {
             Route::post('step-5', [GymRegistrationController::class, 'step5']); // Intelligence
         });
     });
+
+    // Infrastructure Resources (Publicly discoverable for registration)
+    Route::get('custom-fields', [GymController::class, 'getCustomFields']);
 
     // Infrastructure Management (Secured)
     Route::middleware('auth:sanctum')->group(function () {
