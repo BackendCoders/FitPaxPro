@@ -106,6 +106,7 @@
                             <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark border-0 shadow-lg">
                                 <li><a class="dropdown-item" href="{{ route('gym.edit', $gym->id) }}"><iconify-icon icon="tabler:edit" class="me-2"></iconify-icon>Edit Node</a></li>
                                 <li><a class="dropdown-item" href="{{ route('gym.media', $gym->id) }}"><iconify-icon icon="tabler:photo" class="me-2"></iconify-icon>Gallery Settings</a></li>
+                                <li><a class="dropdown-item" href="{{ route('gym.analytics', $gym->id) }}"><iconify-icon icon="tabler:chart-bar" class="me-2"></iconify-icon>Performance Analytics</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form action="{{ route('gym.destroy', $gym->id) }}" method="POST" onsubmit="return confirm('Immediately deactivate this location?')">
@@ -147,7 +148,7 @@
                         <img src="https://ui-avatars.com/api/?name={{ urlencode($gym->owner->name ?? 'N') }}&background=E11218&color=fff" class="rounded-circle me-2" style="width: 20px; height: 20px;">
                         <span class="fs-11 text-white-50">{{ Str::words($gym->owner->name ?? 'Admin', 1, '') }}</span>
                     </div>
-                    <a href="#" class="btn btn-link p-0 text-white-50 text-decoration-none fs-11 fw-bold">ANALYTICS <iconify-icon icon="tabler:chevron-right" class="ms-1 align-middle"></iconify-icon></a>
+                    <a href="{{ route('gym.analytics', $gym->id) }}" class="btn btn-link p-0 text-white-50 text-decoration-none fs-11 fw-bold">ANALYTICS <iconify-icon icon="tabler:chevron-right" class="ms-1 align-middle"></iconify-icon></a>
                 </div>
             </div>
         </div>

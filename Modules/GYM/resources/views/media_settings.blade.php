@@ -60,9 +60,13 @@
                     @foreach($gym->galleryMedia as $media)
                     <div class="gallery-item shadow-sm">
                         <img src="{{ asset('storage/' . $media->file_path) }}">
-                        <div class="delete-overlay">
+                        <div class="delete-overlay" onclick="if(confirm('Are you sure you want to delete this image?')) document.getElementById('delete-media-{{ $media->id }}').submit()">
                             <iconify-icon icon="tabler:trash" class="text-white fs-24"></iconify-icon>
                         </div>
+                        <form action="{{ route('gym.media.destroy', $media->id) }}" method="POST" id="delete-media-{{ $media->id }}" class="d-none">
+                            @csrf
+                            @method('DELETE')
+                        </form>
                     </div>
                     @endforeach
                 </div>

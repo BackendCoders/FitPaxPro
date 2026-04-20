@@ -50,6 +50,10 @@ class PlanController extends Controller
             $data['features'] = array_filter(explode("\n", str_replace("\r", "", $request->features_list)));
         }
 
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('plans', 'public');
+        }
+
         $plan = MembershipPlanTemplate::create($data);
         
         if ($request->has('custom_fields')) {
@@ -91,6 +95,10 @@ class PlanController extends Controller
 
         if ($request->filled('features_list')) {
              $data['features'] = array_filter(explode("\n", str_replace("\r", "", $request->features_list)));
+        }
+
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('plans', 'public');
         }
 
         $plan->update($data);

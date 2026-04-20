@@ -129,17 +129,25 @@ class GYMController extends Controller
 
         // 2. Create custom plans
         if ($request->has('custom_plans')) {
-            foreach ($request->custom_plans as $cp) {
-                \App\Models\GymFeePlan::create([
+            foreach ($request->custom_plans as $index => $cp) {
+                $planData = [
                     'gym_id' => $gym->id,
                     'name' => $cp['name'],
+                    'tagline' => $cp['tagline'] ?? null,
                     'price' => $cp['price'],
                     'offer_price' => $cp['offer_price'] ?? null,
                     'duration_months' => $cp['duration_months'] ?? 1,
                     'includes_diet_plan' => isset($cp['includes_diet_plan']),
                     'includes_trainer' => isset($cp['includes_trainer']),
                     'is_active' => true,
-                ]);
+                ];
+
+                // Handle Plan Image
+                if ($request->hasFile("custom_plans.{$index}.image")) {
+                    $planData['image'] = $request->file("custom_plans.{$index}.image")->store('gyms/plans', 'public');
+                }
+
+                \App\Models\GymFeePlan::create($planData);
             }
         }
 
@@ -158,6 +166,44 @@ class GYMController extends Controller
         $gym = $this->gymRepository->getGymById($uuid);
         $gym->load('galleryMedia');
         return view('gym::media_settings', compact('gym'));
+    }
+
+    /**
+     * Show analytics for a gym.
+     */
+    public function analytics($uuid)
+    {
+        $gym = $this->gymRepository->getGymById($uuid);
+        
+        $stats = [
+            'active_members' => $gym->subscriptions()->where('status', 'active')->count(),
+            'total_revenue' => $gym->subscriptions()->sum('amount_paid'),
+            'pending_enquiries' => $gym->enquiries()->count(), // Filter by status if available
+            'avg_attendance_weekly' => round($gym->attendanceLogs()->where('check_in_time', '>=', now()->subDays(7))->count() / 7, 1),
+            'revenue_this_month' => $gym->subscriptions()
+                ->where('created_at', '>=', now()->startOfMonth())
+                ->sum('amount_paid'),
+            'new_signups_30d' => $gym->subscriptions()
+                ->where('created_at', '>=', now()->subDays(30))
+                ->count(),
+        ];
+
+        // Simplified data for charts
+        $revenueTrend = $gym->subscriptions()
+            ->where('created_at', '>=', now()->subDays(30))
+            ->selectRaw('DATE(created_at) as date, SUM(amount_paid) as total')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        $attendanceTrend = $gym->attendanceLogs()
+            ->where('check_in_time', '>=', now()->subDays(30))
+            ->selectRaw('DATE(check_in_time) as date, COUNT(*) as count')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        return view('gym::analytics', compact('gym', 'stats', 'revenueTrend', 'attendanceTrend'));
     }
 
     /**
@@ -187,6 +233,23 @@ class GYMController extends Controller
         }
 
         return back()->with('success', 'Media portfolio updated successfully.');
+    }
+
+    /**
+     * Remove the specified media from storage.
+     */
+    public function destroyMedia($id)
+    {
+        $media = \App\Models\GymGalleryMedia::findOrFail($id);
+        
+        // Delete file from storage
+        if ($media->file_path && \Storage::disk('public')->exists($media->file_path)) {
+            \Storage::disk('public')->delete($media->file_path);
+        }
+
+        $media->delete();
+
+        return back()->with('success', 'Media removed successfully.');
     }
 
     /**

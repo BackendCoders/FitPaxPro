@@ -291,16 +291,25 @@
     <!-- Compact Template -->
     <template id="custom-plan-template">
         <div class="custom-plan-row">
-            <button type="button" class="btn-remove remove-plan"><iconify-icon icon="tabler:x"></iconify-icon></button>
+            <button type="button" class="btn-remove remove-plan" style="z-index: 10;"><iconify-icon icon="tabler:x"></iconify-icon></button>
             <div class="row g-2">
-                <div class="col-12">
+                <div class="col-8">
                     <input type="text" name="custom_plans[INDEX][name]" class="form-control form-control-sm" placeholder="Plan Name" required>
                 </div>
-                <div class="col-6">
-                    <input type="number" name="custom_plans[INDEX][price]" class="form-control form-control-sm" placeholder="Price" required>
+                <div class="col-4">
+                    <input type="number" name="custom_plans[INDEX][duration_months]" class="form-control form-control-sm" placeholder="Mo" value="1" required>
+                </div>
+                <div class="col-7">
+                    <input type="text" name="custom_plans[INDEX][tagline]" class="form-control form-control-sm" placeholder="Badge/Sales/Offer Tag">
+                </div>
+                <div class="col-5">
+                    <input type="file" name="custom_plans[INDEX][image]" class="form-control form-control-sm" accept="image/*">
                 </div>
                 <div class="col-6">
-                    <input type="number" name="custom_plans[INDEX][duration_months]" class="form-control form-control-sm" placeholder="Mo" value="1" required>
+                    <input type="number" name="custom_plans[INDEX][price]" class="form-control form-control-sm" placeholder="Base Price" required>
+                </div>
+                <div class="col-6">
+                    <input type="number" name="custom_plans[INDEX][offer_price]" class="form-control form-control-sm" placeholder="Offer Price">
                 </div>
             </div>
         </div>
