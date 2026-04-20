@@ -8,11 +8,23 @@ use App\Models\CustomFieldValue;
 trait HasCustomFields
 {
     /**
-     * Get all custom field values for this model.
+     * Get all custom field values for this model formatted for API.
      */
-    public function customFieldValues()
+    public function getCustomFieldsDataAttribute()
     {
-        return $this->morphMany(CustomFieldValue::class, 'model'); // Wait, I didn't use morph in migration.
+        $fields = CustomField::where('model_type', get_class($this))
+            ->where('is_active', true)
+            ->get();
+            
+        $data = [];
+        foreach ($fields as $field) {
+            $value = CustomFieldValue::where('custom_field_id', $field->id)
+                ->where('model_id', $this->id)
+                ->first();
+                
+            $data[$field->name] = $value ? $value->value : $field->default_value;
+        }
+        return $data;
     }
     
     // Correction: I used model_id but not model_type in custom_field_values.

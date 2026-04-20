@@ -18,6 +18,8 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, HasRoles, HasUuid, Notifiable, SoftDeletes, HasCustomFields;
 
+    protected $appends = ['custom_fields_data'];
+
     /**
      * The attributes that are mass assignable.
      *

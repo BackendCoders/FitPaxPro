@@ -12,14 +12,14 @@
         }
     ],
     "paths": {
-        "/api/gym/register": {
+        "/gym/register": {
             "post": {
                 "tags": [
                     "Gym Auth"
                 ],
                 "summary": "Register a new gym mobile account",
                 "description": "Creates a new user record and returns a Sanctum token for mobile app authentication.",
-                "operationId": "a13bdc8119b74db363f47215080d8f73",
+                "operationId": "788720fa4851d1f5c8b3ddf70441c3eb",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -130,14 +130,14 @@
                 }
             }
         },
-        "/api/gym/login": {
+        "/gym/login": {
             "post": {
                 "tags": [
                     "Gym Auth"
                 ],
                 "summary": "Authenticate a gym mobile account",
                 "description": "Logs in using either email or phone and returns a Sanctum token.",
-                "operationId": "dfa26999594156780000d7c0690aa22b",
+                "operationId": "4f0b4ff74188913e63d38f73cc0b9ebe",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -209,6 +209,677 @@
                     }
                 }
             }
+        },
+        "/gym": {
+            "get": {
+                "tags": [
+                    "Gym Infrastructure"
+                ],
+                "summary": "List all registered gym infrastructure nodes",
+                "description": "List all available gym nodes.",
+                "operationId": "39d5d080b1af8ee6298a628bec8a066c",
+                "responses": {
+                    "200": {
+                        "description": "Successful retrieval of gym mesh",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/gym/store": {
+            "post": {
+                "tags": [
+                    "Gym Infrastructure"
+                ],
+                "summary": "Provision a new gym node into the network",
+                "description": "Creates a new gym location with associated metadata and commercial plans.",
+                "operationId": "bc1c26b1b023c1d07e1914def1c9121c",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "phone",
+                                    "address"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Iron Force Elite"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "hq@ironforce.com"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "+919876543210"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "example": "123 Tactical Street, Gym District"
+                                    },
+                                    "member_count_limit": {
+                                        "type": "integer",
+                                        "example": 500
+                                    },
+                                    "platform_plan_id": {
+                                        "type": "string",
+                                        "example": "uuid-here"
+                                    },
+                                    "template_ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "custom_plans": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Black Ops Tier"
+                                                },
+                                                "price": {
+                                                    "type": "number",
+                                                    "example": 2999
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Infrastructure node provisioned successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Gym infrastructure node provisioned successfully."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized session"
+                    },
+                    "422": {
+                        "description": "Validation failure"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/gym/{id}": {
+            "get": {
+                "tags": [
+                    "Gym Infrastructure"
+                ],
+                "summary": "Retrieve comprehensive intelligence for a specific node",
+                "description": "Get details of a specific gym node.",
+                "operationId": "acf75f8af19011c9d9ca24e94ae2c69d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "UUID of the gym node",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Node intelligence retrieved",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Node not found in current sector"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Gym Infrastructure"
+                ],
+                "summary": "Calibrate existing gym node parameters",
+                "description": "Updates profile details, operational status, and custom data field values for a specific node.",
+                "operationId": "eb5bff96bd599db8c1095aa283a02900",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "UUID of the gym node to calibrate",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Iron Force Elite V2"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "hq@ironforce.com"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "+919876543210"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "example": "123 Tactical Street, Gym Sector 4"
+                                    },
+                                    "member_count_limit": {
+                                        "type": "integer",
+                                        "example": 1000
+                                    },
+                                    "platform_plan_id": {
+                                        "type": "string",
+                                        "example": "uuid-tier-id"
+                                    },
+                                    "custom_fields": {
+                                        "type": "object",
+                                        "example": {
+                                            "color_code": "#FF0000",
+                                            "branch_id": "BRANCH-01"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Node calibration successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Gym profile calibrated successfully."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access"
+                    },
+                    "404": {
+                        "description": "Node not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/gym/plans": {
+            "post": {
+                "tags": [
+                    "Gym Plans"
+                ],
+                "summary": "Provision a new commercial plan for a gym node",
+                "description": "Create a new membership plan for a node.",
+                "operationId": "cba43c1fcd6aa5e1af19c4b1e04d0e35",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "gym_id",
+                                    "name",
+                                    "price"
+                                ],
+                                "properties": {
+                                    "gym_id": {
+                                        "type": "string",
+                                        "example": "uuid-node-id"
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Elite operative Pack"
+                                    },
+                                    "price": {
+                                        "type": "number",
+                                        "example": 4999
+                                    },
+                                    "duration_months": {
+                                        "type": "integer",
+                                        "example": 12
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Plan provisioned successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/gym/registration/step-1": {
+            "post": {
+                "tags": [
+                    "Gym App: Provisions"
+                ],
+                "summary": "Step 1: Operative Identity",
+                "operationId": "853f6708fa33ee3ee4c0168eb5b84f56",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "phone",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "phone": {
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Identity captured"
+                    }
+                }
+            }
+        },
+        "/gym/registration/verify-otp": {
+            "post": {
+                "tags": [
+                    "Gym App: Provisions"
+                ],
+                "summary": "Protocol: Verify Identity Signal",
+                "operationId": "0e3515a0c10888e9d76c1cd05ca174a8",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "otp"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "otp": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Authenticated"
+                    }
+                }
+            }
+        },
+        "/gym/registration/step-2": {
+            "post": {
+                "tags": [
+                    "Gym App: Provisions"
+                ],
+                "summary": "Step 2: Commercial Logic",
+                "operationId": "9da29207e421f095de2f6f71acf49e91",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "gym_name"
+                                ],
+                                "properties": {
+                                    "gym_name": {
+                                        "type": "string",
+                                        "example": "Iron Force Elite"
+                                    },
+                                    "template_ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "description": "UUIDs of platform membership templates",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "custom_plans": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Elite operative"
+                                                },
+                                                "price": {
+                                                    "type": "number",
+                                                    "example": 2999
+                                                },
+                                                "tagline": {
+                                                    "type": "string",
+                                                    "example": "Advanced Tactical Training"
+                                                },
+                                                "duration_months": {
+                                                    "type": "integer",
+                                                    "example": 12
+                                                },
+                                                "offer_price": {
+                                                    "type": "number",
+                                                    "example": 2499
+                                                },
+                                                "includes_diet_plan": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "includes_trainer": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Plans synced"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/gym/registration/step-3": {
+            "post": {
+                "tags": [
+                    "Gym App: Provisions"
+                ],
+                "summary": "Step 3: Visual Identity",
+                "operationId": "ff6748d47a5a9270dbe014f60dc062d4",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "gym_id": {
+                                        "description": "UUID of the node",
+                                        "type": "string"
+                                    },
+                                    "image": {
+                                        "description": "Primary node identification image",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "gallery[]": {
+                                        "type": "array",
+                                        "items": {
+                                            "description": "Array of gallery portfolio images",
+                                            "type": "string",
+                                            "format": "binary"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Assets deployed"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/gym/registration/step-4": {
+            "post": {
+                "tags": [
+                    "Gym App: Provisions"
+                ],
+                "summary": "Step 4: Geographic Hub",
+                "operationId": "cfd26993a0567d355a6434d1d334cd74",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "gym_id",
+                                    "latitude",
+                                    "longitude",
+                                    "address"
+                                ],
+                                "properties": {
+                                    "gym_id": {
+                                        "type": "string"
+                                    },
+                                    "latitude": {
+                                        "type": "number"
+                                    },
+                                    "longitude": {
+                                        "type": "number"
+                                    },
+                                    "address": {
+                                        "type": "string"
+                                    },
+                                    "city": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Coords synced"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/gym/registration/step-5": {
+            "post": {
+                "tags": [
+                    "Gym App: Provisions"
+                ],
+                "summary": "Step 5: Final Intel",
+                "operationId": "f7360d41f09741f4a1cefe90a34bc21a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "gym_id"
+                                ],
+                                "properties": {
+                                    "gym_id": {
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Elite fitness facility..."
+                                    },
+                                    "brand_name": {
+                                        "type": "string",
+                                        "example": "Iron Force"
+                                    },
+                                    "custom_fields": {
+                                        "type": "object",
+                                        "example": {
+                                            "color_code": "#FF0000"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Active"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -224,6 +895,18 @@
         {
             "name": "Gym Auth",
             "description": "Gym Auth"
+        },
+        {
+            "name": "Gym Infrastructure",
+            "description": "Gym Infrastructure"
+        },
+        {
+            "name": "Gym Plans",
+            "description": "Gym Plans"
+        },
+        {
+            "name": "Gym App: Provisions",
+            "description": "Gym App: Provisions"
         }
     ]
 }

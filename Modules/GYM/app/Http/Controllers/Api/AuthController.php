@@ -20,7 +20,7 @@ class AuthController extends Controller
      * Register a gym mobile user.
      *
      * @OA\Post(
-     *     path="/api/gym/register",
+     *     path="/gym/register",
      *     tags={"Gym Auth"},
      *     summary="Register a new gym mobile account",
      *     description="Creates a new user record and returns a Sanctum token for mobile app authentication.",
@@ -85,7 +85,7 @@ class AuthController extends Controller
      * Login a gym mobile user.
      *
      * @OA\Post(
-     *     path="/api/gym/login",
+     *     path="/gym/login",
      *     tags={"Gym Auth"},
      *     summary="Authenticate a gym mobile account",
      *     description="Logs in using either email or phone and returns a Sanctum token.",

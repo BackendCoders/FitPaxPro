@@ -172,4 +172,100 @@ class GymRepository implements GymRepositoryInterface
         }
         return false;
     }
+
+    /**
+     * 5-STEP PROVISIONING IMPLEMENTATIONS
+     */
+
+    public function createOperative(array $data)
+    {
+        return \App\Models\User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'phone' => $data['phone'],
+            'password' => $data['password'],
+            'user_type' => 2, // Gym Owner
+            'status' => 0
+        ]);
+    }
+
+    public function verifyOtp(string $email, string $otp)
+    {
+        $verification = \DB::table('gym_otp_verifications')
+            ->where('email', $email)
+            ->where('otp', $otp)
+            ->where('expires_at', '>', now())
+            ->where('is_used', false)
+            ->first();
+
+        if (!$verification) return false;
+
+        \DB::table('gym_otp_verifications')->where('id', $verification->id)->update(['is_used' => true]);
+        
+        $user = \App\Models\User::where('email', $email)->first();
+        $user->update(['status' => 1, 'email_verified_at' => now()]);
+
+        return $user;
+    }
+
+    public function initiateNode(\App\Models\User $owner, array $data)
+    {
+        return Gym::updateOrCreate(
+            ['owner_id' => $owner->id, 'email' => $owner->email],
+            [
+                'name' => $data['gym_name'],
+                'phone' => $owner->phone,
+                'status' => 'pending'
+            ]
+        );
+    }
+
+    public function syncNodePlans(Gym $gym, ?array $templateIds, ?array $customPlans)
+    {
+        if ($templateIds) {
+            $templates = \App\Models\MembershipPlanTemplate::whereIn('id', $templateIds)->get();
+            foreach ($templates as $template) {
+                \App\Models\GymFeePlan::create([
+                    'gym_id' => $gym->id,
+                    'name' => $template->name,
+                    'tagline' => $template->tagline,
+                    'description' => $template->description,
+                    'features' => $template->features,
+                    'price' => $template->price,
+                    'is_active' => true,
+                ]);
+            }
+        }
+
+        if ($customPlans) {
+            foreach ($customPlans as $cp) {
+                \App\Models\GymFeePlan::create(array_merge($cp, ['gym_id' => $gym->id]));
+            }
+        }
+
+        return $gym->load('feePlans');
+    }
+
+    public function uploadNodeAssets(Gym $gym, $mainImage, ?array $gallery)
+    {
+        if ($mainImage) {
+            $gym->update(['image' => $mainImage->store('gyms', 'public')]);
+        }
+
+        if ($gallery) {
+            foreach ($gallery as $file) {
+                $path = $file->store('gyms/gallery', 'public');
+                \App\Models\GymGalleryMedia::create([
+                    'gym_id' => $gym->id,
+                    'file_path' => $path,
+                    'file_type' => 'image',
+                    'file_size' => $file->getSize(),
+                    'file_name' => $file->getClientOriginalName(),
+                    'mime_type' => $file->getClientMimeType(),
+                ]);
+            }
+        }
+
+        return $gym->load('galleryMedia');
+    }
 }

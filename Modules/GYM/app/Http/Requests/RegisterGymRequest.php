@@ -1,0 +1,45 @@
+<?php
+
+namespace Modules\GYM\app\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class RegisterGymRequest extends FormRequest
+{
+    /**
+     * Get the validation rules that apply to the request.
+     */
+    public function rules(): array
+    {
+        return [
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:gyms,email',
+            'phone' => 'required|string|max:20',
+            'address' => 'required|string',
+            'member_count_limit' => 'nullable|integer',
+            'platform_plan_id' => 'nullable|exists:platform_subscription_plans,id',
+            'template_ids' => 'nullable|array',
+            'template_ids.*' => 'exists:membership_plan_templates,id',
+            'gallery' => 'nullable|array',
+            'gallery.*' => 'image|max:5120',
+            'custom_plans' => 'nullable|array',
+            'custom_plans.*.name' => 'required|string',
+            'custom_plans.*.tagline' => 'nullable|string',
+            'custom_plans.*.price' => 'required|numeric',
+            'custom_plans.*.offer_price' => 'nullable|numeric',
+            'custom_plans.*.duration_months' => 'nullable|integer',
+            'custom_plans.*.includes_diet_plan' => 'nullable|boolean',
+            'custom_plans.*.includes_trainer' => 'nullable|boolean',
+            'custom_plans.*.image' => 'nullable|image|max:5120',
+            'custom_fields' => 'nullable|array',
+        ];
+    }
+
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+}

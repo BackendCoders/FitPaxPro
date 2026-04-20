@@ -98,4 +98,13 @@ interface GymRepositoryInterface
      * @return bool
      */
     public function deletePlan(string $id);
+
+    /**
+     * 5-STEP PROVISIONING METHODS
+     */
+    public function createOperative(array $data);
+    public function verifyOtp(string $email, string $otp);
+    public function initiateNode(\App\Models\User $owner, array $data);
+    public function syncNodePlans(\App\Models\Gym $gym, ?array $templateIds, ?array $customPlans);
+    public function uploadNodeAssets(\App\Models\Gym $gym, $mainImage, ?array $gallery);
 }

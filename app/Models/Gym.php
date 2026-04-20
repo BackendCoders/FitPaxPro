@@ -14,6 +14,8 @@ class Gym extends Model
 {
     use HasFactory, HasUuid, SoftDeletes, HasCustomFields;
 
+    protected $appends = ['custom_fields_data'];
+
     protected $table = 'gyms';
 
     protected $guarded = [];
