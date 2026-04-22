@@ -572,6 +572,63 @@
                                                                     "status": {
                                                                         "type": "boolean",
                                                                         "example": true
+                                                                    },
+                                                                    "profile": {
+                                                                        "properties": {
+                                                                            "id": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "user_id": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "alternative_contact": {
+                                                                                "type": "string",
+                                                                                "nullable": true
+                                                                            },
+                                                                            "gender": {
+                                                                                "type": "string",
+                                                                                "nullable": true
+                                                                            },
+                                                                            "age": {
+                                                                                "type": "integer",
+                                                                                "nullable": true
+                                                                            },
+                                                                            "current_weight": {
+                                                                                "type": "number",
+                                                                                "nullable": true
+                                                                            },
+                                                                            "height": {
+                                                                                "type": "number",
+                                                                                "nullable": true
+                                                                            },
+                                                                            "goal_type": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "activity_level": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "diet_type": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "medical_conditions": {
+                                                                                "type": "string",
+                                                                                "nullable": true
+                                                                            },
+                                                                            "allergies": {
+                                                                                "type": "string",
+                                                                                "nullable": true
+                                                                            },
+                                                                            "physical_limitations": {
+                                                                                "type": "string",
+                                                                                "nullable": true
+                                                                            },
+                                                                            "is_public": {
+                                                                                "type": "boolean",
+                                                                                "example": true
+                                                                            }
+                                                                        },
+                                                                        "type": "object",
+                                                                        "nullable": true
                                                                     }
                                                                 },
                                                                 "type": "object"
@@ -661,7 +718,7 @@
                 "tags": [
                     "Gym Members"
                 ],
-                "summary": "Add a new member to a gym",
+                "summary": "Add a new member to a gym and auto-create profile",
                 "operationId": "92f1c8792ba06e6372bb8a9cb3eba1f7",
                 "requestBody": {
                     "required": true,
@@ -715,6 +772,77 @@
                                     "notes": {
                                         "description": "Any additional notes",
                                         "type": "string"
+                                    },
+                                    "alternative_contact": {
+                                        "description": "Secondary contact number",
+                                        "type": "string"
+                                    },
+                                    "gender": {
+                                        "type": "string",
+                                        "enum": [
+                                            "male",
+                                            "female",
+                                            "other",
+                                            "prefer_not_to_say"
+                                        ]
+                                    },
+                                    "age": {
+                                        "type": "integer",
+                                        "example": 25
+                                    },
+                                    "current_weight": {
+                                        "type": "number",
+                                        "example": 75.5
+                                    },
+                                    "height": {
+                                        "type": "number",
+                                        "example": 180
+                                    },
+                                    "goal_type": {
+                                        "type": "string",
+                                        "default": "maintenance",
+                                        "enum": [
+                                            "weight_gain",
+                                            "weight_loss",
+                                            "maintenance",
+                                            "muscle_building"
+                                        ]
+                                    },
+                                    "activity_level": {
+                                        "type": "string",
+                                        "default": "sedentary",
+                                        "enum": [
+                                            "sedentary",
+                                            "lightly_active",
+                                            "moderately_active",
+                                            "very_active",
+                                            "extra_active"
+                                        ]
+                                    },
+                                    "diet_type": {
+                                        "type": "string",
+                                        "default": "veg",
+                                        "enum": [
+                                            "veg",
+                                            "non_veg",
+                                            "eggitarian",
+                                            "vegan",
+                                            "keto",
+                                            "paleo"
+                                        ]
+                                    },
+                                    "medical_conditions": {
+                                        "type": "string"
+                                    },
+                                    "allergies": {
+                                        "type": "string"
+                                    },
+                                    "physical_limitations": {
+                                        "type": "string"
+                                    },
+                                    "is_public": {
+                                        "type": "boolean",
+                                        "default": true
                                     }
                                 },
                                 "type": "object"
@@ -813,6 +941,63 @@
                                                         "status": {
                                                             "type": "boolean",
                                                             "example": true
+                                                        },
+                                                        "profile": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "user_id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "alternative_contact": {
+                                                                    "type": "string",
+                                                                    "nullable": true
+                                                                },
+                                                                "gender": {
+                                                                    "type": "string",
+                                                                    "nullable": true
+                                                                },
+                                                                "age": {
+                                                                    "type": "integer",
+                                                                    "nullable": true
+                                                                },
+                                                                "current_weight": {
+                                                                    "type": "number",
+                                                                    "nullable": true
+                                                                },
+                                                                "height": {
+                                                                    "type": "number",
+                                                                    "nullable": true
+                                                                },
+                                                                "goal_type": {
+                                                                    "type": "string"
+                                                                },
+                                                                "activity_level": {
+                                                                    "type": "string"
+                                                                },
+                                                                "diet_type": {
+                                                                    "type": "string"
+                                                                },
+                                                                "medical_conditions": {
+                                                                    "type": "string",
+                                                                    "nullable": true
+                                                                },
+                                                                "allergies": {
+                                                                    "type": "string",
+                                                                    "nullable": true
+                                                                },
+                                                                "physical_limitations": {
+                                                                    "type": "string",
+                                                                    "nullable": true
+                                                                },
+                                                                "is_public": {
+                                                                    "type": "boolean",
+                                                                    "example": true
+                                                                }
+                                                            },
+                                                            "type": "object",
+                                                            "nullable": true
                                                         }
                                                     },
                                                     "type": "object"
@@ -963,6 +1148,63 @@
                                                         "status": {
                                                             "type": "boolean",
                                                             "example": true
+                                                        },
+                                                        "profile": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "user_id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "alternative_contact": {
+                                                                    "type": "string",
+                                                                    "nullable": true
+                                                                },
+                                                                "gender": {
+                                                                    "type": "string",
+                                                                    "nullable": true
+                                                                },
+                                                                "age": {
+                                                                    "type": "integer",
+                                                                    "nullable": true
+                                                                },
+                                                                "current_weight": {
+                                                                    "type": "number",
+                                                                    "nullable": true
+                                                                },
+                                                                "height": {
+                                                                    "type": "number",
+                                                                    "nullable": true
+                                                                },
+                                                                "goal_type": {
+                                                                    "type": "string"
+                                                                },
+                                                                "activity_level": {
+                                                                    "type": "string"
+                                                                },
+                                                                "diet_type": {
+                                                                    "type": "string"
+                                                                },
+                                                                "medical_conditions": {
+                                                                    "type": "string",
+                                                                    "nullable": true
+                                                                },
+                                                                "allergies": {
+                                                                    "type": "string",
+                                                                    "nullable": true
+                                                                },
+                                                                "physical_limitations": {
+                                                                    "type": "string",
+                                                                    "nullable": true
+                                                                },
+                                                                "is_public": {
+                                                                    "type": "boolean",
+                                                                    "example": true
+                                                                }
+                                                            },
+                                                            "type": "object",
+                                                            "nullable": true
                                                         }
                                                     },
                                                     "type": "object"

@@ -15,7 +15,7 @@ class GymMemberRepository implements GymMemberRepositoryInterface
 {
     public function getMembersByGym(string $gymId, int $perPage = 15)
     {
-        return GymSubscription::with(['user', 'plan'])
+        return GymSubscription::with(['user.profile', 'plan'])
             ->where('gym_id', $gymId)
             ->latest()
             ->paginate($perPage);
@@ -45,6 +45,18 @@ class GymMemberRepository implements GymMemberRepositoryInterface
                 }
             }
             
+            // Sync User Profile Data
+            $profileData = [];
+            $fillable = ['alternative_contact', 'gender', 'age', 'current_weight', 'height', 'goal_type', 'activity_level', 'diet_type', 'medical_conditions', 'allergies', 'physical_limitations', 'is_public'];
+            foreach ($fillable as $field) {
+                if (array_key_exists($field, $data)) {
+                    $profileData[$field] = $data[$field];
+                }
+            }
+            if (!empty($profileData)) {
+                \App\Models\UserProfile::updateOrCreate(['user_id' => $user->id], $profileData);
+            }
+
             // Calculate end date based on plan duration
             $plan = GymFeePlan::findOrFail($data['gym_fee_plan_id']);
             $startDate = Carbon::parse($data['start_date']);
@@ -64,13 +76,13 @@ class GymMemberRepository implements GymMemberRepositoryInterface
                 'notes' => $data['notes'] ?? null,
             ]);
 
-            return $subscription->load(['user', 'plan']);
+            return $subscription->load(['user.profile', 'plan']);
         });
     }
 
     public function getMemberDetails(string $subscriptionId)
     {
-        return GymSubscription::with(['user', 'plan', 'gym'])
+        return GymSubscription::with(['user.profile', 'plan', 'gym'])
             ->findOrFail($subscriptionId);
     }
 }

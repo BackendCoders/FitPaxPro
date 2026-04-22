@@ -70,7 +70,26 @@ class GymMemberController extends Controller
      *                             @OA\Property(property="name", type="string", example="John Doe"),
      *                             @OA\Property(property="email", type="string", format="email", nullable=true),
      *                             @OA\Property(property="phone", type="string", example="1234567890"),
-     *                             @OA\Property(property="status", type="boolean", example=true)
+     *                             @OA\Property(property="status", type="boolean", example=true),
+     *                             @OA\Property(
+     *                                 property="profile",
+     *                                 type="object",
+     *                                 nullable=true,
+     *                                 @OA\Property(property="id", type="string"),
+     *                                 @OA\Property(property="user_id", type="string"),
+     *                                 @OA\Property(property="alternative_contact", type="string", nullable=true),
+     *                                 @OA\Property(property="gender", type="string", nullable=true),
+     *                                 @OA\Property(property="age", type="integer", nullable=true),
+     *                                 @OA\Property(property="current_weight", type="number", nullable=true),
+     *                                 @OA\Property(property="height", type="number", nullable=true),
+     *                                 @OA\Property(property="goal_type", type="string"),
+     *                                 @OA\Property(property="activity_level", type="string"),
+     *                                 @OA\Property(property="diet_type", type="string"),
+     *                                 @OA\Property(property="medical_conditions", type="string", nullable=true),
+     *                                 @OA\Property(property="allergies", type="string", nullable=true),
+     *                                 @OA\Property(property="physical_limitations", type="string", nullable=true),
+     *                                 @OA\Property(property="is_public", type="boolean", example=true)
+     *                             )
      *                         ),
      *                         @OA\Property(
      *                             property="plan",
@@ -117,7 +136,7 @@ class GymMemberController extends Controller
      * @OA\Post(
      *     path="/gym/members",
      *     tags={"Gym Members"},
-     *     summary="Add a new member to a gym",
+     *     summary="Add a new member to a gym and auto-create profile",
      *     security={{"sanctum": {}}},
      *     @OA\RequestBody(
      *         required=true,
@@ -131,7 +150,19 @@ class GymMemberController extends Controller
      *             @OA\Property(property="start_date", type="string", format="date", example="2026-05-01"),
      *             @OA\Property(property="amount_paid", type="number", example=5000),
      *             @OA\Property(property="payment_method", type="string", example="cash", description="e.g., cash, card, upi"),
-     *             @OA\Property(property="notes", type="string", description="Any additional notes")
+     *             @OA\Property(property="notes", type="string", description="Any additional notes"),
+     *             @OA\Property(property="alternative_contact", type="string", description="Secondary contact number"),
+     *             @OA\Property(property="gender", type="string", enum={"male","female","other","prefer_not_to_say"}),
+     *             @OA\Property(property="age", type="integer", example=25),
+     *             @OA\Property(property="current_weight", type="number", example=75.5),
+     *             @OA\Property(property="height", type="number", example=180.0),
+     *             @OA\Property(property="goal_type", type="string", enum={"weight_gain","weight_loss","maintenance","muscle_building"}, default="maintenance"),
+     *             @OA\Property(property="activity_level", type="string", enum={"sedentary","lightly_active","moderately_active","very_active","extra_active"}, default="sedentary"),
+     *             @OA\Property(property="diet_type", type="string", enum={"veg","non_veg","eggitarian","vegan","keto","paleo"}, default="veg"),
+     *             @OA\Property(property="medical_conditions", type="string"),
+     *             @OA\Property(property="allergies", type="string"),
+     *             @OA\Property(property="physical_limitations", type="string"),
+     *             @OA\Property(property="is_public", type="boolean", default=true)
      *         )
      *     ),
      *     @OA\Response(
@@ -163,7 +194,26 @@ class GymMemberController extends Controller
      *                     @OA\Property(property="name", type="string", example="John Doe"),
      *                     @OA\Property(property="email", type="string", format="email", nullable=true),
      *                     @OA\Property(property="phone", type="string", example="1234567890"),
-     *                     @OA\Property(property="status", type="boolean", example=true)
+     *                     @OA\Property(property="status", type="boolean", example=true),
+     *                     @OA\Property(
+     *                         property="profile",
+     *                         type="object",
+     *                         nullable=true,
+     *                         @OA\Property(property="id", type="string"),
+     *                         @OA\Property(property="user_id", type="string"),
+     *                         @OA\Property(property="alternative_contact", type="string", nullable=true),
+     *                         @OA\Property(property="gender", type="string", nullable=true),
+     *                         @OA\Property(property="age", type="integer", nullable=true),
+     *                         @OA\Property(property="current_weight", type="number", nullable=true),
+     *                         @OA\Property(property="height", type="number", nullable=true),
+     *                         @OA\Property(property="goal_type", type="string"),
+     *                         @OA\Property(property="activity_level", type="string"),
+     *                         @OA\Property(property="diet_type", type="string"),
+     *                         @OA\Property(property="medical_conditions", type="string", nullable=true),
+     *                         @OA\Property(property="allergies", type="string", nullable=true),
+     *                         @OA\Property(property="physical_limitations", type="string", nullable=true),
+     *                         @OA\Property(property="is_public", type="boolean", example=true)
+     *                     )
      *                 ),
      *                 @OA\Property(
      *                     property="plan",
@@ -238,7 +288,26 @@ class GymMemberController extends Controller
      *                     @OA\Property(property="name", type="string", example="John Doe"),
      *                     @OA\Property(property="email", type="string", format="email", nullable=true),
      *                     @OA\Property(property="phone", type="string", example="1234567890"),
-     *                     @OA\Property(property="status", type="boolean", example=true)
+     *                     @OA\Property(property="status", type="boolean", example=true),
+     *                     @OA\Property(
+     *                         property="profile",
+     *                         type="object",
+     *                         nullable=true,
+     *                         @OA\Property(property="id", type="string"),
+     *                         @OA\Property(property="user_id", type="string"),
+     *                         @OA\Property(property="alternative_contact", type="string", nullable=true),
+     *                         @OA\Property(property="gender", type="string", nullable=true),
+     *                         @OA\Property(property="age", type="integer", nullable=true),
+     *                         @OA\Property(property="current_weight", type="number", nullable=true),
+     *                         @OA\Property(property="height", type="number", nullable=true),
+     *                         @OA\Property(property="goal_type", type="string"),
+     *                         @OA\Property(property="activity_level", type="string"),
+     *                         @OA\Property(property="diet_type", type="string"),
+     *                         @OA\Property(property="medical_conditions", type="string", nullable=true),
+     *                         @OA\Property(property="allergies", type="string", nullable=true),
+     *                         @OA\Property(property="physical_limitations", type="string", nullable=true),
+     *                         @OA\Property(property="is_public", type="boolean", example=true)
+     *                     )
      *                 ),
      *                 @OA\Property(
      *                     property="plan",
