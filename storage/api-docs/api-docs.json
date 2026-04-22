@@ -447,6 +447,213 @@
                 }
             }
         },
+        "/gym/members": {
+            "get": {
+                "tags": [
+                    "Gym Members"
+                ],
+                "summary": "List all members for a specific gym",
+                "operationId": "a2ba617335b501ba6cbeab116dd20ed7",
+                "parameters": [
+                    {
+                        "name": "gym_id",
+                        "in": "query",
+                        "description": "UUID of the gym to fetch members for",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Members retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Gym Members"
+                ],
+                "summary": "Add a new member to a gym",
+                "operationId": "92f1c8792ba06e6372bb8a9cb3eba1f7",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "gym_id",
+                                    "name",
+                                    "phone",
+                                    "gym_fee_plan_id",
+                                    "start_date",
+                                    "amount_paid"
+                                ],
+                                "properties": {
+                                    "gym_id": {
+                                        "description": "UUID of the gym",
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "description": "Full name of the member",
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "description": "Email of the member (optional)",
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "phone": {
+                                        "description": "Phone number of the member",
+                                        "type": "string"
+                                    },
+                                    "gym_fee_plan_id": {
+                                        "description": "UUID of the selected fee plan",
+                                        "type": "string"
+                                    },
+                                    "start_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-05-01"
+                                    },
+                                    "amount_paid": {
+                                        "type": "number",
+                                        "example": 5000
+                                    },
+                                    "payment_method": {
+                                        "description": "e.g., cash, card, upi",
+                                        "type": "string",
+                                        "example": "cash"
+                                    },
+                                    "notes": {
+                                        "description": "Any additional notes",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Member added successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Member added successfully."
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/gym/members/{id}": {
+            "get": {
+                "tags": [
+                    "Gym Members"
+                ],
+                "summary": "Get details of a specific gym member subscription",
+                "operationId": "b4a8640b9fdb7efa395ed0f9923b1291",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "UUID of the member subscription",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Member details retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Member subscription not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/gym/plans": {
             "post": {
                 "tags": [
@@ -842,6 +1049,10 @@
         {
             "name": "Gym Infrastructure",
             "description": "Gym Infrastructure"
+        },
+        {
+            "name": "Gym Members",
+            "description": "Gym Members"
         },
         {
             "name": "Gym Plans",

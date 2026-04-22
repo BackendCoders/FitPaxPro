@@ -14,6 +14,7 @@ class GymRepositoryServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(GymRepositoryInterface::class, GymRepository::class);
+        $this->app->bind(\Modules\GYM\app\Interfaces\GymMemberRepositoryInterface::class, \Modules\GYM\app\Repositories\GymMemberRepository::class);
     }
 
     /**

@@ -15,8 +15,6 @@ class GymGalleryMedia extends Model
 
     protected $guarded = [];
 
-    protected $appends = ['file_url'];
-
     protected $casts = [
         'file_size' => 'integer',
         'order_index' => 'integer',
@@ -28,16 +26,16 @@ class GymGalleryMedia extends Model
         return $this->belongsTo(Gym::class);
     }
 
-    public function getFileUrlAttribute()
+    public function getFilePathAttribute($value)
     {
-        if (!$this->file_path) {
+        if (!$value) {
             return null;
         }
         
-        if (str_starts_with($this->file_path, 'http')) {
-            return $this->file_path;
+        if (str_starts_with($value, 'http')) {
+            return $value;
         }
         
-        return asset('storage/' . $this->file_path);
+        return asset('storage/' . $value);
     }
 }

@@ -48,5 +48,12 @@ Route::prefix('gym')->group(function () {
             Route::post('/', [GymPlanController::class, 'store']);
             Route::put('{id}', [GymPlanController::class, 'update']);
         });
+
+        // Member Management Hub
+        Route::prefix('members')->group(function () {
+            Route::get('/', [\Modules\GYM\app\Http\Controllers\Api\GymMemberController::class, 'index']);
+            Route::post('/', [\Modules\GYM\app\Http\Controllers\Api\GymMemberController::class, 'store']);
+            Route::get('{id}', [\Modules\GYM\app\Http\Controllers\Api\GymMemberController::class, 'show']);
+        });
     });
 });

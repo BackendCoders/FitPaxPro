@@ -33,7 +33,7 @@ class Gym extends Model
         static::saving(function ($gym) {
             if (empty($gym->slug)) {
                 $gym->slug = \Illuminate\Support\Str::slug($gym->name);
-                
+
                 // Ensure uniqueness
                 $count = static::where('slug', 'like', $gym->slug . '%')->where('id', '!=', $gym->id)->count();
                 if ($count > 0) {
@@ -93,11 +93,11 @@ class Gym extends Model
         if (!$this->image) {
             return null;
         }
-        
+
         if (str_starts_with($this->image, 'http')) {
             return $this->image;
         }
-        
+
         return asset('storage/' . $this->image);
     }
 }

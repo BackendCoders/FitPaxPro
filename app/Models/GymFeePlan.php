@@ -18,8 +18,6 @@ class GymFeePlan extends Model
 
     protected $guarded = [];
 
-    protected $appends = ['image_url'];
-
     protected $casts = [
         'price' => 'decimal:2',
         'offer_price' => 'decimal:2',
@@ -40,16 +38,16 @@ class GymFeePlan extends Model
         return $this->hasMany(GymSubscription::class);
     }
 
-    public function getImageUrlAttribute()
+    public function getImageAttribute($value)
     {
-        if (!$this->image) {
+        if (!$value) {
             return null;
         }
         
-        if (str_starts_with($this->image, 'http')) {
-            return $this->image;
+        if (str_starts_with($value, 'http')) {
+            return $value;
         }
         
-        return asset('storage/' . $this->image);
+        return asset('storage/' . $value);
     }
 }
