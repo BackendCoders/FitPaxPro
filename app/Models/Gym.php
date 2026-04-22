@@ -14,7 +14,7 @@ class Gym extends Model
 {
     use HasFactory, HasUuid, SoftDeletes, HasCustomFields;
 
-    protected $appends = ['custom_fields_data'];
+    protected $appends = ['custom_fields_data', 'image_url'];
 
     protected $table = 'gyms';
 
@@ -86,5 +86,18 @@ class Gym extends Model
     public function subscriptions(): HasMany
     {
         return $this->hasMany(GymSubscription::class);
+    }
+
+    public function getImageUrlAttribute()
+    {
+        if (!$this->image) {
+            return null;
+        }
+        
+        if (str_starts_with($this->image, 'http')) {
+            return $this->image;
+        }
+        
+        return asset('storage/' . $this->image);
     }
 }
