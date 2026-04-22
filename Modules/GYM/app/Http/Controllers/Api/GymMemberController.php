@@ -41,7 +41,58 @@ class GymMemberController extends Controller
      *         description="Members retrieved successfully",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="data", type="object")
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="current_page", type="integer", example=1),
+     *                 @OA\Property(
+     *                     property="data",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="id", type="string", example="uuid-sub-id"),
+     *                         @OA\Property(property="gym_id", type="string", example="uuid-gym-id"),
+     *                         @OA\Property(property="user_id", type="string", example="uuid-user-id"),
+     *                         @OA\Property(property="gym_fee_plan_id", type="string", example="uuid-plan-id"),
+     *                         @OA\Property(property="start_date", type="string", format="date-time", example="2026-05-01T00:00:00.000000Z"),
+     *                         @OA\Property(property="end_date", type="string", format="date-time", example="2027-05-01T00:00:00.000000Z"),
+     *                         @OA\Property(property="amount_paid", type="number", example=5000),
+     *                         @OA\Property(property="payment_status", type="string", example="paid"),
+     *                         @OA\Property(property="payment_method", type="string", example="cash"),
+     *                         @OA\Property(property="status", type="string", example="active"),
+     *                         @OA\Property(property="notes", type="string", nullable=true),
+     *                         @OA\Property(property="created_at", type="string", format="date-time"),
+     *                         @OA\Property(property="updated_at", type="string", format="date-time"),
+     *                         @OA\Property(
+     *                             property="user",
+     *                             type="object",
+     *                             @OA\Property(property="id", type="string", example="uuid-user-id"),
+     *                             @OA\Property(property="name", type="string", example="John Doe"),
+     *                             @OA\Property(property="email", type="string", format="email", nullable=true),
+     *                             @OA\Property(property="phone", type="string", example="1234567890"),
+     *                             @OA\Property(property="status", type="boolean", example=true)
+     *                         ),
+     *                         @OA\Property(
+     *                             property="plan",
+     *                             type="object",
+     *                             @OA\Property(property="id", type="string", example="uuid-plan-id"),
+     *                             @OA\Property(property="name", type="string", example="Elite Pack"),
+     *                             @OA\Property(property="price", type="number", example=4999),
+     *                             @OA\Property(property="duration_months", type="integer", example=12)
+     *                         )
+     *                     )
+     *                 ),
+     *                 @OA\Property(property="first_page_url", type="string"),
+     *                 @OA\Property(property="from", type="integer", example=1),
+     *                 @OA\Property(property="last_page", type="integer", example=5),
+     *                 @OA\Property(property="last_page_url", type="string"),
+     *                 @OA\Property(property="next_page_url", type="string", nullable=true),
+     *                 @OA\Property(property="path", type="string"),
+     *                 @OA\Property(property="per_page", type="integer", example=15),
+     *                 @OA\Property(property="prev_page_url", type="string", nullable=true),
+     *                 @OA\Property(property="to", type="integer", example=15),
+     *                 @OA\Property(property="total", type="integer", example=75)
+     *             )
      *         )
      *     ),
      *     @OA\Response(response=422, description="Validation error")
@@ -89,7 +140,40 @@ class GymMemberController extends Controller
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Member added successfully."),
-     *             @OA\Property(property="data", type="object")
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="string", example="uuid-sub-id"),
+     *                 @OA\Property(property="gym_id", type="string", example="uuid-gym-id"),
+     *                 @OA\Property(property="user_id", type="string", example="uuid-user-id"),
+     *                 @OA\Property(property="gym_fee_plan_id", type="string", example="uuid-plan-id"),
+     *                 @OA\Property(property="start_date", type="string", format="date-time"),
+     *                 @OA\Property(property="end_date", type="string", format="date-time"),
+     *                 @OA\Property(property="amount_paid", type="number", example=5000),
+     *                 @OA\Property(property="payment_status", type="string", example="paid"),
+     *                 @OA\Property(property="payment_method", type="string", example="cash"),
+     *                 @OA\Property(property="status", type="string", example="active"),
+     *                 @OA\Property(property="notes", type="string", nullable=true),
+     *                 @OA\Property(property="created_at", type="string", format="date-time"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time"),
+     *                 @OA\Property(
+     *                     property="user",
+     *                     type="object",
+     *                     @OA\Property(property="id", type="string", example="uuid-user-id"),
+     *                     @OA\Property(property="name", type="string", example="John Doe"),
+     *                     @OA\Property(property="email", type="string", format="email", nullable=true),
+     *                     @OA\Property(property="phone", type="string", example="1234567890"),
+     *                     @OA\Property(property="status", type="boolean", example=true)
+     *                 ),
+     *                 @OA\Property(
+     *                     property="plan",
+     *                     type="object",
+     *                     @OA\Property(property="id", type="string", example="uuid-plan-id"),
+     *                     @OA\Property(property="name", type="string", example="Elite Pack"),
+     *                     @OA\Property(property="price", type="number", example=4999),
+     *                     @OA\Property(property="duration_months", type="integer", example=12)
+     *                 )
+     *             )
      *         )
      *     ),
      *     @OA\Response(response=422, description="Validation error")
@@ -131,7 +215,40 @@ class GymMemberController extends Controller
      *         description="Member details retrieved successfully",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="data", type="object")
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="string", example="uuid-sub-id"),
+     *                 @OA\Property(property="gym_id", type="string", example="uuid-gym-id"),
+     *                 @OA\Property(property="user_id", type="string", example="uuid-user-id"),
+     *                 @OA\Property(property="gym_fee_plan_id", type="string", example="uuid-plan-id"),
+     *                 @OA\Property(property="start_date", type="string", format="date-time"),
+     *                 @OA\Property(property="end_date", type="string", format="date-time"),
+     *                 @OA\Property(property="amount_paid", type="number", example=5000),
+     *                 @OA\Property(property="payment_status", type="string", example="paid"),
+     *                 @OA\Property(property="payment_method", type="string", example="cash"),
+     *                 @OA\Property(property="status", type="string", example="active"),
+     *                 @OA\Property(property="notes", type="string", nullable=true),
+     *                 @OA\Property(property="created_at", type="string", format="date-time"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time"),
+     *                 @OA\Property(
+     *                     property="user",
+     *                     type="object",
+     *                     @OA\Property(property="id", type="string", example="uuid-user-id"),
+     *                     @OA\Property(property="name", type="string", example="John Doe"),
+     *                     @OA\Property(property="email", type="string", format="email", nullable=true),
+     *                     @OA\Property(property="phone", type="string", example="1234567890"),
+     *                     @OA\Property(property="status", type="boolean", example=true)
+     *                 ),
+     *                 @OA\Property(
+     *                     property="plan",
+     *                     type="object",
+     *                     @OA\Property(property="id", type="string", example="uuid-plan-id"),
+     *                     @OA\Property(property="name", type="string", example="Elite Pack"),
+     *                     @OA\Property(property="price", type="number", example=4999),
+     *                     @OA\Property(property="duration_months", type="integer", example=12)
+     *                 )
+     *             )
      *         )
      *     ),
      *     @OA\Response(response=404, description="Member subscription not found")

@@ -487,6 +487,158 @@
                                             "example": true
                                         },
                                         "data": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "example": "uuid-sub-id"
+                                                            },
+                                                            "gym_id": {
+                                                                "type": "string",
+                                                                "example": "uuid-gym-id"
+                                                            },
+                                                            "user_id": {
+                                                                "type": "string",
+                                                                "example": "uuid-user-id"
+                                                            },
+                                                            "gym_fee_plan_id": {
+                                                                "type": "string",
+                                                                "example": "uuid-plan-id"
+                                                            },
+                                                            "start_date": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": "2026-05-01T00:00:00.000000Z"
+                                                            },
+                                                            "end_date": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": "2027-05-01T00:00:00.000000Z"
+                                                            },
+                                                            "amount_paid": {
+                                                                "type": "number",
+                                                                "example": 5000
+                                                            },
+                                                            "payment_status": {
+                                                                "type": "string",
+                                                                "example": "paid"
+                                                            },
+                                                            "payment_method": {
+                                                                "type": "string",
+                                                                "example": "cash"
+                                                            },
+                                                            "status": {
+                                                                "type": "string",
+                                                                "example": "active"
+                                                            },
+                                                            "notes": {
+                                                                "type": "string",
+                                                                "nullable": true
+                                                            },
+                                                            "created_at": {
+                                                                "type": "string",
+                                                                "format": "date-time"
+                                                            },
+                                                            "updated_at": {
+                                                                "type": "string",
+                                                                "format": "date-time"
+                                                            },
+                                                            "user": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "string",
+                                                                        "example": "uuid-user-id"
+                                                                    },
+                                                                    "name": {
+                                                                        "type": "string",
+                                                                        "example": "John Doe"
+                                                                    },
+                                                                    "email": {
+                                                                        "type": "string",
+                                                                        "format": "email",
+                                                                        "nullable": true
+                                                                    },
+                                                                    "phone": {
+                                                                        "type": "string",
+                                                                        "example": "1234567890"
+                                                                    },
+                                                                    "status": {
+                                                                        "type": "boolean",
+                                                                        "example": true
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            },
+                                                            "plan": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "string",
+                                                                        "example": "uuid-plan-id"
+                                                                    },
+                                                                    "name": {
+                                                                        "type": "string",
+                                                                        "example": "Elite Pack"
+                                                                    },
+                                                                    "price": {
+                                                                        "type": "number",
+                                                                        "example": 4999
+                                                                    },
+                                                                    "duration_months": {
+                                                                        "type": "integer",
+                                                                        "example": 12
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "first_page_url": {
+                                                    "type": "string"
+                                                },
+                                                "from": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "last_page_url": {
+                                                    "type": "string"
+                                                },
+                                                "next_page_url": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "path": {
+                                                    "type": "string"
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 15
+                                                },
+                                                "prev_page_url": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "to": {
+                                                    "type": "integer",
+                                                    "example": 15
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 75
+                                                }
+                                            },
                                             "type": "object"
                                         }
                                     },
@@ -586,6 +738,107 @@
                                             "example": "Member added successfully."
                                         },
                                         "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "example": "uuid-sub-id"
+                                                },
+                                                "gym_id": {
+                                                    "type": "string",
+                                                    "example": "uuid-gym-id"
+                                                },
+                                                "user_id": {
+                                                    "type": "string",
+                                                    "example": "uuid-user-id"
+                                                },
+                                                "gym_fee_plan_id": {
+                                                    "type": "string",
+                                                    "example": "uuid-plan-id"
+                                                },
+                                                "start_date": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "end_date": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "amount_paid": {
+                                                    "type": "number",
+                                                    "example": 5000
+                                                },
+                                                "payment_status": {
+                                                    "type": "string",
+                                                    "example": "paid"
+                                                },
+                                                "payment_method": {
+                                                    "type": "string",
+                                                    "example": "cash"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "active"
+                                                },
+                                                "notes": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "user": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string",
+                                                            "example": "uuid-user-id"
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "John Doe"
+                                                        },
+                                                        "email": {
+                                                            "type": "string",
+                                                            "format": "email",
+                                                            "nullable": true
+                                                        },
+                                                        "phone": {
+                                                            "type": "string",
+                                                            "example": "1234567890"
+                                                        },
+                                                        "status": {
+                                                            "type": "boolean",
+                                                            "example": true
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "plan": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string",
+                                                            "example": "uuid-plan-id"
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "Elite Pack"
+                                                        },
+                                                        "price": {
+                                                            "type": "number",
+                                                            "example": 4999
+                                                        },
+                                                        "duration_months": {
+                                                            "type": "integer",
+                                                            "example": 12
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
                                             "type": "object"
                                         }
                                     },
@@ -635,6 +888,107 @@
                                             "example": true
                                         },
                                         "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "example": "uuid-sub-id"
+                                                },
+                                                "gym_id": {
+                                                    "type": "string",
+                                                    "example": "uuid-gym-id"
+                                                },
+                                                "user_id": {
+                                                    "type": "string",
+                                                    "example": "uuid-user-id"
+                                                },
+                                                "gym_fee_plan_id": {
+                                                    "type": "string",
+                                                    "example": "uuid-plan-id"
+                                                },
+                                                "start_date": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "end_date": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "amount_paid": {
+                                                    "type": "number",
+                                                    "example": 5000
+                                                },
+                                                "payment_status": {
+                                                    "type": "string",
+                                                    "example": "paid"
+                                                },
+                                                "payment_method": {
+                                                    "type": "string",
+                                                    "example": "cash"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "active"
+                                                },
+                                                "notes": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "user": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string",
+                                                            "example": "uuid-user-id"
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "John Doe"
+                                                        },
+                                                        "email": {
+                                                            "type": "string",
+                                                            "format": "email",
+                                                            "nullable": true
+                                                        },
+                                                        "phone": {
+                                                            "type": "string",
+                                                            "example": "1234567890"
+                                                        },
+                                                        "status": {
+                                                            "type": "boolean",
+                                                            "example": true
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "plan": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string",
+                                                            "example": "uuid-plan-id"
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "Elite Pack"
+                                                        },
+                                                        "price": {
+                                                            "type": "number",
+                                                            "example": 4999
+                                                        },
+                                                        "duration_months": {
+                                                            "type": "integer",
+                                                            "example": 12
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
                                             "type": "object"
                                         }
                                     },
