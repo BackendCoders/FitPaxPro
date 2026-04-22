@@ -45,7 +45,9 @@ Route::prefix('gym')->group(function () {
 
         // Commercial Plan Hub
         Route::prefix('plans')->group(function () {
+            Route::get('/', [GymPlanController::class, 'index']);
             Route::post('/', [GymPlanController::class, 'store']);
+            Route::get('{id}', [GymPlanController::class, 'show']);
             Route::put('{id}', [GymPlanController::class, 'update']);
         });
 

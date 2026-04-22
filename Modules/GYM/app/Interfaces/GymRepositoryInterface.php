@@ -67,6 +67,14 @@ interface GymRepositoryInterface
     public function getAllPlans();
 
     /**
+     * Get plans by Gym ID.
+     * 
+     * @param string $gymId
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getPlansByGymId(string $gymId);
+
+    /**
      * Get a plan by its ID.
      * 
      * @param string $id

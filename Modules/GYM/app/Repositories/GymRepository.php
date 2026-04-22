@@ -109,14 +109,20 @@ class GymRepository implements GymRepositoryInterface
         return \App\Models\GymSubscription::where('id', $id)->firstOrFail();
     }
 
-    /**
-     * Get all membership plans.
-     * 
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
     public function getAllPlans()
     {
         return \App\Models\GymFeePlan::with('gym')->latest()->get();
+    }
+
+    /**
+     * Get all plans for a specific gym.
+     * 
+     * @param string $gymId
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getPlansByGymId(string $gymId)
+    {
+        return \App\Models\GymFeePlan::where('gym_id', $gymId)->latest()->get();
     }
 
     /**

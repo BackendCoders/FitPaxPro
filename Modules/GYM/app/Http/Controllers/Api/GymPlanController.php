@@ -16,6 +16,88 @@ class GymPlanController extends Controller
     ) {}
 
     /**
+     * Get all plans for a specific gym.
+     *
+     * @OA\Get(
+     *     path="/gym/plans",
+     *     tags={"Gym Plans"},
+     *     summary="List all commercial plans for a gym",
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="gym_id",
+     *         in="query",
+     *         description="UUID of the gym to fetch plans for",
+     *         required=true,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Plans retrieved successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="array", @OA\Items(type="object"))
+     *         )
+     *     ),
+     *     @OA\Response(response=422, description="Validation error")
+     * )
+     */
+    public function index(Request $request): JsonResponse
+    {
+        $request->validate([
+            'gym_id' => 'required|uuid|exists:gyms,id'
+        ]);
+
+        $plans = $this->gymRepository->getPlansByGymId($request->gym_id);
+        
+        return response()->json([
+            'success' => true,
+            'data' => $plans
+        ]);
+    }
+
+    /**
+     * Get details of a specific plan.
+     *
+     * @OA\Get(
+     *     path="/gym/plans/{id}",
+     *     tags={"Gym Plans"},
+     *     summary="Get details of a specific gym plan",
+     *     security={{"sanctum": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="UUID of the plan",
+     *         required=true,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Plan retrieved successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="object")
+     *         )
+     *     ),
+     *     @OA\Response(response=404, description="Plan not found")
+     * )
+     */
+    public function show($id): JsonResponse
+    {
+        try {
+            $plan = $this->gymRepository->getPlanById($id);
+            return response()->json([
+                'success' => true,
+                'data' => $plan
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Plan not found.'
+            ], 404);
+        }
+    }
+
+    /**
      * Create a new membership plan for a node.
      *
      * @OA\Post(

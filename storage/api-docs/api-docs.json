@@ -655,6 +655,57 @@
             }
         },
         "/gym/plans": {
+            "get": {
+                "tags": [
+                    "Gym Plans"
+                ],
+                "summary": "List all commercial plans for a gym",
+                "description": "Get all plans for a specific gym.",
+                "operationId": "d23d9299b78279e24543f3b9bbcc1272",
+                "parameters": [
+                    {
+                        "name": "gym_id",
+                        "in": "query",
+                        "description": "UUID of the gym to fetch plans for",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Plans retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
             "post": {
                 "tags": [
                     "Gym Plans"
@@ -714,6 +765,56 @@
                                 }
                             }
                         }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/gym/plans/{id}": {
+            "get": {
+                "tags": [
+                    "Gym Plans"
+                ],
+                "summary": "Get details of a specific gym plan",
+                "description": "Get details of a specific plan.",
+                "operationId": "612c5bb7203ed0b338e287571de635b9",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "UUID of the plan",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Plan retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Plan not found"
                     }
                 },
                 "security": [
