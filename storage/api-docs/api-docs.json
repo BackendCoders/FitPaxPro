@@ -687,6 +687,70 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string",
+                                                        "example": "a19a67fe-d3e7-4e86-b737-48f3a8f14632"
+                                                    },
+                                                    "gym_id": {
+                                                        "type": "string",
+                                                        "example": "a19a67fe-d358-4b65-9eed-0d386213dfb8"
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Elite Pack"
+                                                    },
+                                                    "tagline": {
+                                                        "type": "string",
+                                                        "example": "Get Fit"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "Full access plan"
+                                                    },
+                                                    "price": {
+                                                        "type": "number",
+                                                        "example": 4999
+                                                    },
+                                                    "offer_price": {
+                                                        "type": "number",
+                                                        "example": 3999
+                                                    },
+                                                    "duration_months": {
+                                                        "type": "integer",
+                                                        "example": 12
+                                                    },
+                                                    "includes_diet_plan": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    },
+                                                    "includes_trainer": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    },
+                                                    "max_gym_visits_per_week": {
+                                                        "type": "integer",
+                                                        "example": 7,
+                                                        "nullable": true
+                                                    },
+                                                    "image": {
+                                                        "type": "string",
+                                                        "example": "https://yourdomain.com/storage/gyms/plans/image.jpg",
+                                                        "nullable": true
+                                                    },
+                                                    "is_active": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
                                                 "type": "object"
                                             }
                                         }
@@ -716,7 +780,7 @@
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "multipart/form-data": {
                             "schema": {
                                 "required": [
                                     "gym_id",
@@ -726,7 +790,7 @@
                                 "properties": {
                                     "gym_id": {
                                         "type": "string",
-                                        "example": "uuid-node-id"
+                                        "example": "a19a67fe-d358-4b65-9eed-0d386213dfb8"
                                     },
                                     "name": {
                                         "type": "string",
@@ -736,9 +800,38 @@
                                         "type": "number",
                                         "example": 4999
                                     },
+                                    "tagline": {
+                                        "type": "string",
+                                        "example": "Best plan"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Includes everything"
+                                    },
                                     "duration_months": {
                                         "type": "integer",
                                         "example": 12
+                                    },
+                                    "offer_price": {
+                                        "type": "number",
+                                        "example": 3999
+                                    },
+                                    "includes_diet_plan": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "includes_trainer": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "max_gym_visits_per_week": {
+                                        "type": "integer",
+                                        "example": 7
+                                    },
+                                    "image": {
+                                        "description": "Plan cover image",
+                                        "type": "string",
+                                        "format": "binary"
                                     }
                                 },
                                 "type": "object"
@@ -757,7 +850,75 @@
                                             "type": "boolean",
                                             "example": true
                                         },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Commercial plan provisioned successfully."
+                                        },
                                         "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "example": "a19a67fe-d3e7-4e86-b737-48f3a8f14632"
+                                                },
+                                                "gym_id": {
+                                                    "type": "string",
+                                                    "example": "a19a67fe-d358-4b65-9eed-0d386213dfb8"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Elite operative Pack"
+                                                },
+                                                "tagline": {
+                                                    "type": "string",
+                                                    "example": "Best plan"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Includes everything"
+                                                },
+                                                "price": {
+                                                    "type": "number",
+                                                    "example": 4999
+                                                },
+                                                "offer_price": {
+                                                    "type": "number",
+                                                    "example": 3999
+                                                },
+                                                "duration_months": {
+                                                    "type": "integer",
+                                                    "example": 12
+                                                },
+                                                "includes_diet_plan": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "includes_trainer": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "max_gym_visits_per_week": {
+                                                    "type": "integer",
+                                                    "example": 7,
+                                                    "nullable": true
+                                                },
+                                                "image": {
+                                                    "type": "string",
+                                                    "example": "https://yourdomain.com/storage/gyms/plans/image.jpg",
+                                                    "nullable": true
+                                                },
+                                                "is_active": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
                                             "type": "object"
                                         }
                                     },
@@ -805,6 +966,70 @@
                                             "example": true
                                         },
                                         "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "example": "a19a67fe-d3e7-4e86-b737-48f3a8f14632"
+                                                },
+                                                "gym_id": {
+                                                    "type": "string",
+                                                    "example": "a19a67fe-d358-4b65-9eed-0d386213dfb8"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Elite Pack"
+                                                },
+                                                "tagline": {
+                                                    "type": "string",
+                                                    "example": "Get Fit"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Full access plan"
+                                                },
+                                                "price": {
+                                                    "type": "number",
+                                                    "example": 4999
+                                                },
+                                                "offer_price": {
+                                                    "type": "number",
+                                                    "example": 3999
+                                                },
+                                                "duration_months": {
+                                                    "type": "integer",
+                                                    "example": 12
+                                                },
+                                                "includes_diet_plan": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "includes_trainer": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "max_gym_visits_per_week": {
+                                                    "type": "integer",
+                                                    "example": 7,
+                                                    "nullable": true
+                                                },
+                                                "image": {
+                                                    "type": "string",
+                                                    "example": "https://yourdomain.com/storage/gyms/plans/image.jpg",
+                                                    "nullable": true
+                                                },
+                                                "is_active": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
                                             "type": "object"
                                         }
                                     },
@@ -815,6 +1040,181 @@
                     },
                     "404": {
                         "description": "Plan not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Gym Plans"
+                ],
+                "summary": "Update a commercial plan for a gym node (Use POST with _method=PUT for multipart)",
+                "description": "Update an independent plan node.",
+                "operationId": "ff7a6e8dc29b7485d35aaaf76be8d087",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "UUID of the plan",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "_method": {
+                                        "description": "Required for multipart/form-data in Laravel",
+                                        "type": "string",
+                                        "example": "PUT"
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Elite operative Pack V2"
+                                    },
+                                    "price": {
+                                        "type": "number",
+                                        "example": 5999
+                                    },
+                                    "tagline": {
+                                        "type": "string",
+                                        "example": "Updated plan"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Includes everything updated"
+                                    },
+                                    "duration_months": {
+                                        "type": "integer",
+                                        "example": 12
+                                    },
+                                    "offer_price": {
+                                        "type": "number",
+                                        "example": 4999
+                                    },
+                                    "includes_diet_plan": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "includes_trainer": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "max_gym_visits_per_week": {
+                                        "type": "integer",
+                                        "example": 7
+                                    },
+                                    "is_active": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "image": {
+                                        "description": "Plan cover image",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Plan parameters calibrated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Plan parameters calibrated."
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "example": "a19a67fe-d3e7-4e86-b737-48f3a8f14632"
+                                                },
+                                                "gym_id": {
+                                                    "type": "string",
+                                                    "example": "a19a67fe-d358-4b65-9eed-0d386213dfb8"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Elite operative Pack V2"
+                                                },
+                                                "tagline": {
+                                                    "type": "string",
+                                                    "example": "Updated plan"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Includes everything updated"
+                                                },
+                                                "price": {
+                                                    "type": "number",
+                                                    "example": 5999
+                                                },
+                                                "offer_price": {
+                                                    "type": "number",
+                                                    "example": 4999
+                                                },
+                                                "duration_months": {
+                                                    "type": "integer",
+                                                    "example": 12
+                                                },
+                                                "includes_diet_plan": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "includes_trainer": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "max_gym_visits_per_week": {
+                                                    "type": "integer",
+                                                    "example": 7,
+                                                    "nullable": true
+                                                },
+                                                "image": {
+                                                    "type": "string",
+                                                    "example": "https://yourdomain.com/storage/gyms/plans/image.jpg",
+                                                    "nullable": true
+                                                },
+                                                "is_active": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
