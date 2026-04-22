@@ -40,8 +40,6 @@ Route::prefix('gym')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/', [GymController::class, 'index']);
         Route::post('store', [GymController::class, 'store']);
-        Route::get('{id}', [GymController::class, 'show']);
-        Route::put('{id}', [GymController::class, 'update']);
 
         // Commercial Plan Hub
         Route::prefix('plans')->group(function () {
@@ -57,5 +55,8 @@ Route::prefix('gym')->group(function () {
             Route::post('/', [\Modules\GYM\app\Http\Controllers\Api\GymMemberController::class, 'store']);
             Route::get('{id}', [\Modules\GYM\app\Http\Controllers\Api\GymMemberController::class, 'show']);
         });
+
+        Route::get('{id}', [GymController::class, 'show']);
+        Route::put('{id}', [GymController::class, 'update']);
     });
 });
