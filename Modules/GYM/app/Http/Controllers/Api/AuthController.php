@@ -77,6 +77,36 @@ class AuthController extends Controller
         $request->validate(['email' => 'required', 'otp' => 'required']);
         $result = $this->authRepository->verifyLoginOtp($request->email, $request->otp);
 
+        $user = \App\Models\User::with('ownedGyms')->find($result['user']['id']);
+        
+        if ($user && $user->user_type == 2) {
+            $gym = $user->ownedGyms->first();
+            $isCompleted = false;
+            $currentStep = 2;
+
+            if ($gym) {
+                if ($gym->status === 'active') {
+                    $isCompleted = true;
+                } elseif ($gym->latitude && $gym->longitude) {
+                    $currentStep = 5;
+                } elseif ($gym->image) {
+                    $currentStep = 4;
+                } else {
+                    $currentStep = 3;
+                }
+            }
+
+            if (!$isCompleted) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Registration incomplete.',
+                    'current_step' => $currentStep,
+                    'gym_data' => $gym,
+                    'data' => $result
+                ]);
+            }
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Identity validated. Login successful.',
