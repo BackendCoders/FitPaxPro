@@ -88,7 +88,7 @@ class GYMController extends Controller
         $dynamicRules = \App\Models\Gym::getCustomFieldRules(\App\Models\Gym::class);
         $request->validate(array_merge($rules, $dynamicRules));
 
-        $data = $request->except(['template_ids', 'custom_plans']);
+        $data = $request->except(['template_ids', 'custom_plans', 'category_ids']);
         $data['owner_id'] = auth()->id(); 
 
         $gym = $this->gymRepository->createGym($data);
@@ -301,7 +301,7 @@ class GYMController extends Controller
         $dynamicRules = \App\Models\Gym::getCustomFieldRules(\App\Models\Gym::class);
         $request->validate(array_merge($rules, $dynamicRules));
 
-        $this->gymRepository->updateGym($uuid, $request->all());
+        $this->gymRepository->updateGym($uuid, $request->except(['category_ids']));
 
         if ($request->has('custom_fields')) {
             $gym->saveCustomFields($request->custom_fields);
