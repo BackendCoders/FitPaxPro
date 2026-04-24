@@ -2127,6 +2127,446 @@
                     }
                 ]
             }
+        },
+        "/user-app/gyms": {
+            "get": {
+                "tags": [
+                    "User App: Gym Discovery"
+                ],
+                "summary": "List all public active gyms",
+                "description": "Retrieve a paginated list of active gyms, sorted by sponsored status and rating.",
+                "operationId": "9ac8e122b5a0373553deedd86b344e3c",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search by name, brand, address, or city",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "city",
+                        "in": "query",
+                        "description": "Filter by exact city",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page (default: 15)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of gyms"
+                    }
+                }
+            }
+        },
+        "/user-app/gyms/{identifier}": {
+            "get": {
+                "tags": [
+                    "User App: Gym Discovery"
+                ],
+                "summary": "Get details of a specific gym",
+                "description": "Retrieve comprehensive details of an active gym by its ID or Slug. Includes fee plans, gallery media, and recent reviews.",
+                "operationId": "70d2a1dc9b0b7b3726d6694e962c9126",
+                "parameters": [
+                    {
+                        "name": "identifier",
+                        "in": "path",
+                        "description": "Gym ID or Slug",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Gym details"
+                    },
+                    "404": {
+                        "description": "Gym not found or inactive"
+                    }
+                }
+            }
+        },
+        "/user-app/profile/measurements": {
+            "post": {
+                "tags": [
+                    "User App: Profile"
+                ],
+                "summary": "Log historical body measurements",
+                "operationId": "0d850b6c04baf071910848c95ba65295",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "weight": {
+                                        "type": "number",
+                                        "example": 75.5
+                                    },
+                                    "chest": {
+                                        "type": "number",
+                                        "example": 102
+                                    },
+                                    "waist": {
+                                        "type": "number",
+                                        "example": 85
+                                    },
+                                    "hips": {
+                                        "type": "number",
+                                        "example": 95
+                                    },
+                                    "biceps": {
+                                        "type": "number",
+                                        "example": 38.5
+                                    },
+                                    "thighs": {
+                                        "type": "number",
+                                        "example": 60
+                                    },
+                                    "body_fat_percentage": {
+                                        "type": "number",
+                                        "example": 15.2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Measurement logged successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/user-app/registration/step-1": {
+            "post": {
+                "tags": [
+                    "User App: Onboarding"
+                ],
+                "summary": "Step 1: User Identity",
+                "operationId": "d5b790d31b6c0048728e3c899e4c4246",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "john@example.com"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "+1234567890"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Identity captured. OTP sent."
+                    }
+                }
+            }
+        },
+        "/user-app/registration/verify-otp": {
+            "post": {
+                "tags": [
+                    "User App: Onboarding"
+                ],
+                "summary": "Protocol: Verify Identity Signal",
+                "operationId": "4ced92ee152aba6d86c309d49deb8fa9",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "otp"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "john@example.com"
+                                    },
+                                    "otp": {
+                                        "type": "string",
+                                        "example": "123456"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Authenticated"
+                    }
+                }
+            }
+        },
+        "/user-app/registration/step-2": {
+            "post": {
+                "tags": [
+                    "User App: Onboarding"
+                ],
+                "summary": "Step 2: Physical Attributes",
+                "operationId": "bb9cfd5763ff8bc5300f814f15b00a72",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "gender": {
+                                        "type": "string",
+                                        "example": "male"
+                                    },
+                                    "date_of_birth": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "1995-05-15"
+                                    },
+                                    "height": {
+                                        "type": "number",
+                                        "example": 180.5
+                                    },
+                                    "current_weight": {
+                                        "type": "number",
+                                        "example": 75
+                                    },
+                                    "target_weight": {
+                                        "type": "number",
+                                        "example": 70
+                                    },
+                                    "blood_group": {
+                                        "type": "string",
+                                        "example": "O+"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Physical attributes updated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/user-app/registration/step-3": {
+            "post": {
+                "tags": [
+                    "User App: Onboarding"
+                ],
+                "summary": "Step 3: Goals & Lifestyle",
+                "operationId": "ecef4ddf67022a04c538c39740396418",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "fitness_level": {
+                                        "type": "string",
+                                        "example": "intermediate"
+                                    },
+                                    "goal_type": {
+                                        "type": "string",
+                                        "example": "weight_loss"
+                                    },
+                                    "activity_level": {
+                                        "type": "string",
+                                        "example": "moderately_active"
+                                    },
+                                    "diet_type": {
+                                        "type": "string",
+                                        "example": "veg"
+                                    },
+                                    "workout_frequency_goal": {
+                                        "type": "integer",
+                                        "example": 4
+                                    },
+                                    "preferred_workout_time": {
+                                        "type": "string",
+                                        "example": "morning"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Goals & Lifestyle updated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/user-app/registration/step-4": {
+            "post": {
+                "tags": [
+                    "User App: Onboarding"
+                ],
+                "summary": "Step 4: Medical Intel",
+                "operationId": "4196162d2b417e6915aa9cafbd5b13b2",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "medical_conditions": {
+                                        "type": "string",
+                                        "example": "None"
+                                    },
+                                    "allergies": {
+                                        "type": "string",
+                                        "example": "Peanuts"
+                                    },
+                                    "physical_limitations": {
+                                        "type": "string",
+                                        "example": "Bad knee"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Medical intel updated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/user-app/registration/step-5": {
+            "post": {
+                "tags": [
+                    "User App: Onboarding"
+                ],
+                "summary": "Step 5: Visual Assets & Privacy",
+                "operationId": "3f8f1002d68a06e12897a438fcaa4a34",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "profile_image": {
+                                        "description": "User Avatar",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "is_public": {
+                                        "description": "Controls Find Friend visibility",
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Node active"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/user-app/auth/login": {
+            "post": {
+                "tags": [
+                    "User App: Auth"
+                ],
+                "summary": "User App Login",
+                "operationId": "651d6814f2eb0823fbd9ec2531632672",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "john@example.com"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OTP sent for login"
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -2158,6 +2598,22 @@
         {
             "name": "Gym App: Provisions",
             "description": "Gym App: Provisions"
+        },
+        {
+            "name": "User App: Gym Discovery",
+            "description": "User App: Gym Discovery"
+        },
+        {
+            "name": "User App: Profile",
+            "description": "User App: Profile"
+        },
+        {
+            "name": "User App: Onboarding",
+            "description": "User App: Onboarding"
+        },
+        {
+            "name": "User App: Auth",
+            "description": "User App: Auth"
         }
     ]
 }

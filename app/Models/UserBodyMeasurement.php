@@ -7,23 +7,23 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class UserProfile extends Model
+class UserBodyMeasurement extends Model
 {
     use HasFactory, HasUuid;
 
-    protected $table = 'user_profiles';
+    protected $table = 'user_body_measurements';
 
     protected $guarded = [];
 
     protected $casts = [
-        'age' => 'integer',
-        'current_weight' => 'decimal:2',
-        'target_weight' => 'decimal:2',
+        'recorded_at' => 'date',
+        'weight' => 'decimal:2',
+        'chest' => 'decimal:2',
+        'waist' => 'decimal:2',
+        'hips' => 'decimal:2',
+        'biceps' => 'decimal:2',
+        'thighs' => 'decimal:2',
         'body_fat_percentage' => 'decimal:2',
-        'height' => 'decimal:2',
-        'is_public' => 'boolean',
-        'date_of_birth' => 'date',
-        'workout_frequency_goal' => 'integer',
     ];
 
     public function user(): BelongsTo
