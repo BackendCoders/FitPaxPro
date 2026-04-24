@@ -55,6 +55,12 @@
             border: none; transition: 0.3s;
         }
         .btn-command-trigger:hover { background: #fff; color: #E11218; transform: rotate(90deg); }
+
+        /* Progress Bar Styles */
+        .progress-container { margin-bottom: 18px; }
+        .progress-label { display: flex; justify-content: space-between; font-size: 9px; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; color: rgba(255,255,255,0.4); letter-spacing: 0.5px; }
+        .cc-progress { height: 4px; background: rgba(255,255,255,0.05); border-radius: 2px; overflow: hidden; }
+        .cc-progress-bar { height: 100%; background: linear-gradient(to right, #E11218, #ff4d52); transition: 1s ease-in-out; }
     </style>
     @endpush
 
@@ -139,6 +145,16 @@
                     <h5 class="gym-name">{{ $gym->name }}</h5>
                     <p class="gym-loc"><iconify-icon icon="tabler:map-pin" class="me-1"></iconify-icon>{{ Str::limit($gym->address, 35) }}</p>
                     
+                    <div class="progress-container">
+                        <div class="progress-label">
+                            <span>Intelligence completion</span>
+                            <span>{{ $gym->completion_progress['steps_completed'] }}/{{ $gym->completion_progress['total_steps'] }} Steps</span>
+                        </div>
+                        <div class="cc-progress">
+                            <div class="cc-progress-bar" style="width: {{ $gym->completion_progress['percentage'] }}%"></div>
+                        </div>
+                    </div>
+
                     <div class="gym-meta">
                         <div class="meta-item">
                             <iconify-icon icon="tabler:users"></iconify-icon>

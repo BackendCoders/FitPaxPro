@@ -15,7 +15,34 @@ class Gym extends Model
 {
     use HasFactory, HasUuid, SoftDeletes, HasCustomFields;
 
-    protected $appends = ['custom_fields_data', 'image_url'];
+    protected $appends = ['custom_fields_data', 'image_url', 'completion_progress'];
+
+    public function getCompletionProgressAttribute()
+    {
+        $steps = 0;
+        
+        // Step 1: Operative Identity
+        if ($this->owner_id) $steps++;
+        
+        // Step 2: Commercial Logic
+        if ($this->name && $this->feePlans()->exists()) $steps++;
+        
+        // Step 3: Visual Identity
+        if ($this->image || $this->galleryMedia()->exists()) $steps++;
+        
+        // Step 4: Geographic Hub
+        if ($this->latitude && $this->longitude && $this->address) $steps++;
+        
+        // Step 5: Final Intel
+        if ($this->description && $this->status === 'active') $steps++;
+
+        return [
+            'steps_completed' => $steps,
+            'total_steps' => 5,
+            'percentage' => ($steps / 5) * 100,
+            'is_complete' => $steps === 5
+        ];
+    }
 
     protected $table = 'gyms';
 
