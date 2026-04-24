@@ -132,6 +132,21 @@
                                     <label class="form-label">Physical Address</label>
                                     <textarea name="address" class="form-control" rows="2" placeholder="Street, Building, City..." required></textarea>
                                 </div>
+                                <div class="col-md-12 mt-2">
+                                    <label class="form-label">Service Categories</label>
+                                    <div class="row g-2">
+                                        @foreach($categories as $category)
+                                        <div class="col-6 col-md-4">
+                                            <div class="compact-plan" onclick="toggleCategory('{{ $category->id }}')">
+                                                <input class="form-check-input neon-switch" type="checkbox" name="category_ids[]" value="{{ $category->id }}" id="cat_{{ $category->id }}">
+                                                <div>
+                                                    <h6 class="fs-11">{{ $category->name }}</h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -319,6 +334,12 @@
     <script>
         function togglePlan(id) {
             const cb = document.getElementById('plan_' + id);
+            if (event.target !== cb) cb.checked = !cb.checked;
+            cb.closest('.compact-plan').classList.toggle('selected', cb.checked);
+        }
+
+        function toggleCategory(id) {
+            const cb = document.getElementById('cat_' + id);
             if (event.target !== cb) cb.checked = !cb.checked;
             cb.closest('.compact-plan').classList.toggle('selected', cb.checked);
         }

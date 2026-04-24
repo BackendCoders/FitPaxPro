@@ -59,8 +59,9 @@ class GYMController extends Controller
     public function create()
     {
         $templates = \App\Models\MembershipPlanTemplate::where('is_active', true)->get();
-        $platformPlans = \DB::table('platform_subscription_plans')->get(); // Using DB for now or create model
-        return view('gym::create', compact('templates', 'platformPlans'));
+        $platformPlans = \DB::table('platform_subscription_plans')->get(); 
+        $categories = \App\Models\Category::where('is_active', true)->orderBy('name', 'asc')->get();
+        return view('gym::create', compact('templates', 'platformPlans', 'categories'));
     }
 
     /**
@@ -80,6 +81,8 @@ class GYMController extends Controller
             'custom_plans' => 'nullable|array',
             'custom_plans.*.name' => 'required|string',
             'custom_plans.*.price' => 'required|numeric',
+            'category_ids' => 'nullable|array',
+            'category_ids.*' => 'exists:categories,id',
         ];
 
         $dynamicRules = \App\Models\Gym::getCustomFieldRules(\App\Models\Gym::class);
@@ -157,6 +160,10 @@ class GYMController extends Controller
 
         if ($request->has('custom_fields')) {
             $gym->saveCustomFields($request->custom_fields);
+        }
+
+        if ($request->has('category_ids')) {
+            $gym->categories()->sync($request->category_ids);
         }
 
         return redirect()->route('gym.index')->with('success', 'Gym created successfully with selected plans!');
@@ -272,7 +279,9 @@ class GYMController extends Controller
     public function edit($uuid)
     {
         $gym = $this->gymRepository->getGymById($uuid);
-        return view('gym::edit', compact('gym'));
+        $gym->load('categories');
+        $categories = \App\Models\Category::where('is_active', true)->orderBy('name', 'asc')->get();
+        return view('gym::edit', compact('gym', 'categories'));
     }
 
     /**
@@ -296,6 +305,12 @@ class GYMController extends Controller
 
         if ($request->has('custom_fields')) {
             $gym->saveCustomFields($request->custom_fields);
+        }
+
+        if ($request->has('category_ids')) {
+            $gym->categories()->sync($request->category_ids);
+        } else {
+            $gym->categories()->sync([]);
         }
 
         return redirect()->route('gym.index')->with('success', 'Gym updated successfully!');

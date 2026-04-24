@@ -83,6 +83,10 @@
                         </div>
                     </div>
                     <div class="action-row">
+                        <button type="button" class="btn-stealth" 
+                                onclick="launchPreview('{{ $banner->image_url }}', '{{ $banner->title }}', '{{ $banner->badge_text }}', '{{ $banner->background_color_hex }}')">
+                            Review
+                        </button>
                         <a href="{{ route('admin.banners.edit', $banner->id) }}" class="btn-stealth">Configure</a>
                         <form action="{{ route('admin.banners.destroy', $banner->id) }}" method="POST" class="flex-grow-1">
                             @csrf
@@ -95,4 +99,41 @@
             @endforeach
         </div>
     </div>
+
+    <!-- Banner Preview Modal -->
+    <div class="modal fade" id="bannerPreviewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0" style="background: transparent;">
+                <div class="modal-body p-0">
+                    <div class="mobile-mockup-wrapper">
+                        <!-- Simulated App Banner Component -->
+                        <div id="mock-banner-node" style="width: 100%; aspect-ratio: 21/9; border-radius: 20px; overflow: hidden; position: relative; display: flex; align-items: center; justify-content: flex-start; padding: 25px;">
+                            <img id="mock-banner-img" src="" style="position: absolute; top:0; left:0; width:100%; height:100%; object-fit: cover; opacity: 0.9;">
+                            <div style="position: relative; z-index: 2;">
+                                <span id="mock-banner-badge" style="background: rgba(255,255,255,0.2); backdrop-filter: blur(5px); color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; letter-spacing: 1px; text-transform: uppercase;"></span>
+                                <h4 id="mock-banner-title" style="color: #fff; font-weight: 900; margin-top: 10px; font-size: 1.2rem; line-height: 1.2; text-shadow: 0 2px 10px rgba(0,0,0,0.3);"></h4>
+                            </div>
+                        </div>
+                        <div class="text-center mt-3">
+                            <button type="button" class="btn-stealth px-4" data-bs-dismiss="modal">Close Visualization</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @push('scripts')
+    <script>
+        function launchPreview(img, title, badge, color) {
+            const modal = new bootstrap.Modal(document.getElementById('bannerPreviewModal'));
+            document.getElementById('mock-banner-img').src = img;
+            document.getElementById('mock-banner-title').innerText = title;
+            document.getElementById('mock-banner-badge').innerText = badge || 'PROMO';
+            document.getElementById('mock-banner-node').style.backgroundColor = color || '#E11218';
+            
+            modal.show();
+        }
+    </script>
+    @endpush
 </x-app-layout>

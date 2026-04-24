@@ -78,7 +78,14 @@
 
                     <div class="col-md-3">
                         <label class="field-label">Chroma Node (Hex)</label>
-                        <input type="text" name="background_color_hex" class="form-control stealth-input" value="{{ old('background_color_hex', $banner->background_color_hex ?? '#E11218') }}">
+                        <div class="d-flex gap-2">
+                            <input type="color" class="form-control stealth-input p-1" style="width: 50px;" 
+                                value="{{ old('background_color_hex', $banner->background_color_hex ?? '#E11218') }}"
+                                oninput="document.getElementById('hex_text').value = this.value">
+                            <input type="text" name="background_color_hex" id="hex_text" class="form-control stealth-input" 
+                                value="{{ old('background_color_hex', $banner->background_color_hex ?? '#E11218') }}"
+                                oninput="this.previousElementSibling.value = this.value">
+                        </div>
                     </div>
 
                     <div class="col-md-3">

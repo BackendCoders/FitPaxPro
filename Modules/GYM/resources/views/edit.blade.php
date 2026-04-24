@@ -55,6 +55,17 @@
         .btn-cancel { background: transparent; border: 1px solid var(--cc-border); color: var(--cc-muted); font-weight: 600; padding: 10px 20px; border-radius: 8px; font-size: 0.9rem; }
         
         .neon-switch { width: 34px; height: 18px; }
+
+        /* Compact Selection Boxes */
+        .compact-plan { 
+            background: var(--cc-input); border: 1px solid var(--cc-border); 
+            border-radius: 10px; padding: 12px 15px; cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .compact-plan:hover { border-color: rgba(255,255,255,0.15); }
+        .compact-plan.selected { border-color: var(--cc-accent); background: rgba(225, 18, 24, 0.05); }
+        .compact-plan h6 { font-size: 0.85rem; margin: 0; font-weight: 600; }
+        .compact-plan small { font-size: 0.75rem; color: var(--cc-muted); }
     </style>
     @endpush
 
@@ -95,6 +106,22 @@
                                 <div class="col-md-12">
                                     <label class="form-label">Physical Address</label>
                                     <textarea name="address" class="form-control" rows="2" required>{{ $gym->address }}</textarea>
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    <label class="form-label">Service Categories</label>
+                                    <div class="row g-2">
+                                        @php $selectedCategories = $gym->categories->pluck('id')->toArray(); @endphp
+                                        @foreach($categories as $category)
+                                        <div class="col-6 col-md-4">
+                                            <div class="compact-plan {{ in_array($category->id, $selectedCategories) ? 'selected' : '' }}" onclick="toggleCategory('{{ $category->id }}')">
+                                                <input class="form-check-input neon-switch" type="checkbox" name="category_ids[]" value="{{ $category->id }}" id="cat_{{ $category->id }}" {{ in_array($category->id, $selectedCategories) ? 'checked' : '' }}>
+                                                <div>
+                                                    <h6 class="fs-11">{{ $category->name }}</h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @endforeach
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -191,6 +218,12 @@
                 }
                 reader.readAsDataURL(input.files[0]);
             }
+        }
+
+        function toggleCategory(id) {
+            const cb = document.getElementById('cat_' + id);
+            if (event.target !== cb) cb.checked = !cb.checked;
+            cb.closest('.compact-plan').classList.toggle('selected', cb.checked);
         }
     </script>
     @endpush
