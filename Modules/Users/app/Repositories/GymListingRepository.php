@@ -25,16 +25,46 @@ class GymListingRepository implements GymListingRepositoryInterface
             });
         }
 
+        if (!empty($filters['lat']) && !empty($filters['lng'])) {
+            $lat = (float) $filters['lat'];
+            $lng = (float) $filters['lng'];
+            $radius = !empty($filters['radius']) ? (int) $filters['radius'] : 10; // Default 10km
+
+            // Haversine formula
+            $query->selectRaw("*, ( 6371 * acos( cos( radians(?) ) *
+                cos( radians( latitude ) ) *
+                cos( radians( longitude ) - radians(?) ) +
+                sin( radians(?) ) *
+                sin( radians( latitude ) ) )
+            ) AS distance", [$lat, $lng, $lat])
+            ->having('distance', '<=', $radius)
+            ->orderBy('distance', 'asc');
+        }
+
         if (!empty($filters['city'])) {
             $query->where('city', $filters['city']);
         }
 
-        // Sponsor gyms first, then highest rated
-        $query->orderBy('is_sponsored', 'desc')
-              ->orderBy('rating_avg', 'desc')
-              ->orderBy('created_at', 'desc');
+        if (empty($filters['lat']) || empty($filters['lng'])) {
+            // Only apply these orderings if we are not sorting by distance
+            $query->orderBy('is_sponsored', 'desc')
+                  ->orderBy('rating_avg', 'desc')
+                  ->orderBy('created_at', 'desc');
+        }
 
         return $query->paginate($perPage);
+    }
+
+    public function getFeaturedGyms(int $limit = 5)
+    {
+        return Gym::where('status', 'active')
+            ->with(['galleryMedia' => function ($q) {
+                $q->where('file_type', 'image')->limit(1);
+            }])
+            ->orderBy('rating_avg', 'desc')
+            ->orderBy('is_sponsored', 'desc')
+            ->limit($limit)
+            ->get();
     }
 
     public function getGymDetails(string $identifier): ?Gym

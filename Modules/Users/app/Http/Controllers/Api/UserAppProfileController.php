@@ -55,4 +55,28 @@ class UserAppProfileController extends Controller
             'data' => $measurement
         ]);
     }
+
+    /**
+     * @OA\Get(
+     *     path="/user-app/auth/me",
+     *     tags={"User App: Auth"},
+     *     summary="Get User Profile (Me)",
+     *     description="Fetches the logged-in user's first name and profile picture URL for the top-left avatar.",
+     *     security={{"sanctum": {}}},
+     *     @OA\Response(response=200, description="User's basic info")
+     * )
+     */
+    public function me(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        $firstName = explode(' ', trim($user->name))[0] ?? '';
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'first_name' => $firstName,
+                'profile_image' => $user->profile_image
+            ]
+        ]);
+    }
 }

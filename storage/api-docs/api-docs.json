@@ -2134,7 +2134,7 @@
                     "User App: Gym Discovery"
                 ],
                 "summary": "List all public active gyms",
-                "description": "Retrieve a paginated list of active gyms, sorted by sponsored status and rating.",
+                "description": "Retrieve a paginated list of active gyms, sorted by sponsored status and rating. If lat and lng are provided, sorts by distance.",
                 "operationId": "9ac8e122b5a0373553deedd86b344e3c",
                 "parameters": [
                     {
@@ -2156,6 +2156,33 @@
                         }
                     },
                     {
+                        "name": "lat",
+                        "in": "query",
+                        "description": "User latitude",
+                        "required": false,
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "lng",
+                        "in": "query",
+                        "description": "User longitude",
+                        "required": false,
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "radius",
+                        "in": "query",
+                        "description": "Search radius in km (default 10)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
                         "name": "per_page",
                         "in": "query",
                         "description": "Items per page (default: 15)",
@@ -2168,6 +2195,32 @@
                 "responses": {
                     "200": {
                         "description": "List of gyms"
+                    }
+                }
+            }
+        },
+        "/user-app/gyms/featured": {
+            "get": {
+                "tags": [
+                    "User App: Gym Discovery"
+                ],
+                "summary": "Get Top Rated / Featured Gyms",
+                "description": "Retrieve top rated and sponsored gyms for the horizontal scrolling list at the top.",
+                "operationId": "db4d5c48a16a2e5e388ecbc9fce3fbf5",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Number of items (default: 5)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of featured gyms"
                     }
                 }
             }
@@ -2227,6 +2280,80 @@
                 }
             }
         },
+        "/user-app/banners": {
+            "get": {
+                "tags": [
+                    "User App: Gym Discovery"
+                ],
+                "summary": "Get Promotional Banners",
+                "description": "Retrieve dynamic promotional banners to display at the top of the app.",
+                "operationId": "4c4c0683d53969b0022fa0384a46e226",
+                "responses": {
+                    "200": {
+                        "description": "List of banners"
+                    }
+                }
+            }
+        },
+        "/user-app/categories": {
+            "get": {
+                "tags": [
+                    "User App: Gym Discovery"
+                ],
+                "summary": "Get gym and workout categories",
+                "description": "Retrieve category names, icons, and IDs for filtering.",
+                "operationId": "d29303c4a3c4bede170c14933b813454",
+                "responses": {
+                    "200": {
+                        "description": "List of categories"
+                    }
+                }
+            }
+        },
+        "/user-app/search": {
+            "get": {
+                "tags": [
+                    "User App: Gym Discovery"
+                ],
+                "summary": "Global Search (Gyms, Categories, Trainers)",
+                "description": "Search across gym names, categories, and trainers. Returns formatted results grouped by type.",
+                "operationId": "94e2426d6851acce290de5db2e570e27",
+                "parameters": [
+                    {
+                        "name": "query",
+                        "in": "query",
+                        "description": "Search text",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "lat",
+                        "in": "query",
+                        "description": "User latitude",
+                        "required": false,
+                        "schema": {
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "lng",
+                        "in": "query",
+                        "description": "User longitude",
+                        "required": false,
+                        "schema": {
+                            "type": "number"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Formatted search results"
+                    }
+                }
+            }
+        },
         "/user-app/profile/measurements": {
             "post": {
                 "tags": [
@@ -2277,6 +2404,26 @@
                 "responses": {
                     "200": {
                         "description": "Measurement logged successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/user-app/auth/me": {
+            "get": {
+                "tags": [
+                    "User App: Auth"
+                ],
+                "summary": "Get User Profile (Me)",
+                "description": "Fetches the logged-in user's first name and profile picture URL for the top-left avatar.",
+                "operationId": "9241199f271a1b17f4c77104bb1ea3d2",
+                "responses": {
+                    "200": {
+                        "description": "User's basic info"
                     }
                 },
                 "security": [
@@ -2634,12 +2781,12 @@
             "description": "User App: Profile"
         },
         {
-            "name": "User App: Onboarding",
-            "description": "User App: Onboarding"
-        },
-        {
             "name": "User App: Auth",
             "description": "User App: Auth"
+        },
+        {
+            "name": "User App: Onboarding",
+            "description": "User App: Onboarding"
         }
     ]
 }

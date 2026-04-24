@@ -19,19 +19,43 @@ class GymListingController extends Controller
      *     path="/user-app/gyms",
      *     tags={"User App: Gym Discovery"},
      *     summary="List all public active gyms",
-     *     description="Retrieve a paginated list of active gyms, sorted by sponsored status and rating.",
+     *     description="Retrieve a paginated list of active gyms, sorted by sponsored status and rating. If lat and lng are provided, sorts by distance.",
      *     @OA\Parameter(name="search", in="query", required=false, @OA\Schema(type="string"), description="Search by name, brand, address, or city"),
      *     @OA\Parameter(name="city", in="query", required=false, @OA\Schema(type="string"), description="Filter by exact city"),
+     *     @OA\Parameter(name="lat", in="query", required=false, @OA\Schema(type="number"), description="User latitude"),
+     *     @OA\Parameter(name="lng", in="query", required=false, @OA\Schema(type="number"), description="User longitude"),
+     *     @OA\Parameter(name="radius", in="query", required=false, @OA\Schema(type="integer"), description="Search radius in km (default 10)"),
      *     @OA\Parameter(name="per_page", in="query", required=false, @OA\Schema(type="integer"), description="Items per page (default: 15)"),
      *     @OA\Response(response=200, description="List of gyms")
      * )
      */
     public function index(Request $request): JsonResponse
     {
-        $filters = $request->only(['search', 'city']);
+        $filters = $request->only(['search', 'city', 'lat', 'lng', 'radius']);
         $perPage = (int) $request->input('per_page', 15);
 
         $gyms = $this->gymListingRepository->getActiveGyms($filters, $perPage);
+
+        return response()->json([
+            'success' => true,
+            'data' => $gyms
+        ]);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/user-app/gyms/featured",
+     *     tags={"User App: Gym Discovery"},
+     *     summary="Get Top Rated / Featured Gyms",
+     *     description="Retrieve top rated and sponsored gyms for the horizontal scrolling list at the top.",
+     *     @OA\Parameter(name="limit", in="query", required=false, @OA\Schema(type="integer"), description="Number of items (default: 5)"),
+     *     @OA\Response(response=200, description="List of featured gyms")
+     * )
+     */
+    public function featured(Request $request): JsonResponse
+    {
+        $limit = (int) $request->input('limit', 5);
+        $gyms = $this->gymListingRepository->getFeaturedGyms($limit);
 
         return response()->json([
             'success' => true,

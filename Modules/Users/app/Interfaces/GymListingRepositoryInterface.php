@@ -9,13 +9,21 @@ interface GymListingRepositoryInterface
 {
     /**
      * Get a paginated list of public, active gyms.
-     * Can optionally filter by search query or city.
+     * Can optionally filter by search query, city, and location (lat, lng, radius).
      *
      * @param array $filters
      * @param int $perPage
      * @return LengthAwarePaginator
      */
     public function getActiveGyms(array $filters = [], int $perPage = 15): LengthAwarePaginator;
+
+    /**
+     * Get top-rated / featured gyms.
+     *
+     * @param int $limit
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getFeaturedGyms(int $limit = 5);
 
     /**
      * Get details of a specific gym by its ID or Slug.
