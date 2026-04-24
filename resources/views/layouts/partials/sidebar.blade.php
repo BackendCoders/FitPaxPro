@@ -201,6 +201,26 @@
                         <span class="sidebar-text"> Dynamic Fields </span>
                     </a>
                 </li>
+                
+                <li>
+                    <a href="{{ route('admin.banners.index') }}"
+                        class="tp-link {{ request()->routeIs('admin.banners.*') ? 'active' : '' }}">
+                        <span class="nav-icon text-white">
+                            <iconify-icon icon="tabler:photo-up"></iconify-icon>
+                        </span>
+                        <span class="sidebar-text"> App Banners </span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('admin.categories.index') }}"
+                        class="tp-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
+                        <span class="nav-icon text-white">
+                            <iconify-icon icon="tabler:category-2"></iconify-icon>
+                        </span>
+                        <span class="sidebar-text"> System Categories </span>
+                    </a>
+                </li>
 
                 <li>
                     <a href="{{ route('admin.settings.index') }}"

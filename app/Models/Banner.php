@@ -24,4 +24,11 @@ class Banner extends Model
         'is_active' => 'boolean',
         'order' => 'integer',
     ];
+
+    public function getImageUrlAttribute($value)
+    {
+        if (!$value) return null;
+        if (filter_var($value, FILTER_VALIDATE_URL)) return $value;
+        return asset('storage/' . $value);
+    }
 }
