@@ -23,25 +23,9 @@ class UserAppDiscoveryController extends Controller
      */
     public function banners(): JsonResponse
     {
-        // Returning mock promotional banners since there's no banners table yet
-        $banners = [
-            [
-                'id' => 1,
-                'badge_text' => 'OFFER',
-                'title' => 'Save 50% on Annual Plans!',
-                'background_color_hex' => '#FF5733',
-                'image_url' => 'https://example.com/banner1.jpg', // Replace with actual asset URL
-                'target_link' => 'plan_123'
-            ],
-            [
-                'id' => 2,
-                'badge_text' => 'NEW',
-                'title' => 'Try CrossFit Training',
-                'background_color_hex' => '#33A1FF',
-                'image_url' => 'https://example.com/banner2.jpg',
-                'target_link' => 'category_crossfit'
-            ]
-        ];
+        $banners = \App\Models\Banner::where('is_active', true)
+            ->orderBy('order', 'asc')
+            ->get();
 
         return response()->json([
             'success' => true,
