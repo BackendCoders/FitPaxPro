@@ -25,6 +25,7 @@ Route::prefix('user-app')->group(function () {
     // Public Gym Listing Routes
     Route::get('/gyms', [GymListingController::class, 'index']);
     Route::get('/gyms/{identifier}', [GymListingController::class, 'show']);
+    Route::get('/gyms/{identifier}/plans', [GymListingController::class, 'plans']);
 
     Route::post('/registration/step-1', [UserAppRegistrationController::class, 'step1']);
     Route::post('/registration/verify-otp', [UserAppRegistrationController::class, 'verifyOtp']);

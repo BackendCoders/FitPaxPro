@@ -2201,6 +2201,32 @@
                 }
             }
         },
+        "/user-app/gyms/{identifier}/plans": {
+            "get": {
+                "tags": [
+                    "User App: Gym Discovery"
+                ],
+                "summary": "Get pricing plans of a specific gym",
+                "description": "Retrieve all active fee/pricing plans for a specific gym.",
+                "operationId": "1ea32bbf28be8e54410f73c738784a8b",
+                "parameters": [
+                    {
+                        "name": "identifier",
+                        "in": "path",
+                        "description": "Gym ID or Slug",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of pricing plans"
+                    }
+                }
+            }
+        },
         "/user-app/profile/measurements": {
             "post": {
                 "tags": [

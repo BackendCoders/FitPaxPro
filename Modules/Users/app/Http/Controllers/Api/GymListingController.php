@@ -66,4 +66,31 @@ class GymListingController extends Controller
             'data' => $gym
         ]);
     }
+
+    /**
+     * @OA\Get(
+     *     path="/user-app/gyms/{identifier}/plans",
+     *     tags={"User App: Gym Discovery"},
+     *     summary="Get pricing plans of a specific gym",
+     *     description="Retrieve all active fee/pricing plans for a specific gym.",
+     *     @OA\Parameter(name="identifier", in="path", required=true, @OA\Schema(type="string"), description="Gym ID or Slug"),
+     *     @OA\Response(response=200, description="List of pricing plans")
+     * )
+     */
+    public function plans(string $identifier): JsonResponse
+    {
+        $plans = $this->gymListingRepository->getGymPlans($identifier);
+
+        if ($plans->isEmpty() && !\App\Models\Gym::where('id', $identifier)->orWhere('slug', $identifier)->exists()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gym not found or has no active plans.'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $plans
+        ]);
+    }
 }

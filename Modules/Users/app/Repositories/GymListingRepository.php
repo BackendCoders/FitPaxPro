@@ -58,4 +58,22 @@ class GymListingRepository implements GymListingRepositoryInterface
             ])
             ->first();
     }
+
+    public function getGymPlans(string $identifier)
+    {
+        $gym = Gym::where('status', 'active')
+            ->where(function ($q) use ($identifier) {
+                $q->where('id', $identifier)
+                  ->orWhere('slug', $identifier);
+            })
+            ->first();
+
+        if (!$gym) {
+            return collect();
+        }
+
+        return \App\Models\GymFeePlan::where('gym_id', $gym->id)
+            ->where('is_active', true)
+            ->get();
+    }
 }

@@ -24,4 +24,12 @@ interface GymListingRepositoryInterface
      * @return Gym|null
      */
     public function getGymDetails(string $identifier): ?Gym;
+
+    /**
+     * Get pricing plans for a specific gym by its ID or Slug.
+     *
+     * @param string $identifier ID or Slug
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getGymPlans(string $identifier);
 }
