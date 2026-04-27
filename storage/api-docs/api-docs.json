@@ -199,6 +199,13 @@
                                         "type": "string",
                                         "example": "123 Tactical Street, Gym District"
                                     },
+                                    "youtube_links": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "example": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                                        }
+                                    },
                                     "member_count_limit": {
                                         "type": "integer",
                                         "example": 500
@@ -356,6 +363,13 @@
                                     "address": {
                                         "type": "string",
                                         "example": "123 Tactical Street, Gym Sector 4"
+                                    },
+                                    "youtube_links": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "example": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                                        }
                                     },
                                     "member_count_limit": {
                                         "type": "integer",
@@ -2128,6 +2142,167 @@
                 ]
             }
         },
+        "/api/gym/videos": {
+            "get": {
+                "tags": [
+                    "Discovery"
+                ],
+                "summary": "Get all gym YouTube videos with filters",
+                "operationId": "6c0029d34809f554debd1f273d9cbeab",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search by video title or gym name",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "gym_id",
+                        "in": "query",
+                        "description": "Filter by gym UUID",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "city",
+                        "in": "query",
+                        "description": "Filter by city",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "category_id",
+                        "in": "query",
+                        "description": "Filter by category UUID",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "is_main_video",
+                        "in": "query",
+                        "description": "Filter by main video status (0 or 1)",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    }
+                }
+            }
+        },
+        "/api/gym/interaction/like": {
+            "post": {
+                "tags": [
+                    "Interactions"
+                ],
+                "summary": "Toggle like/unlike for a media or other interactable",
+                "operationId": "aa7c4c272d1a6d4f0e2d5c976deefe78",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "likeable_id": {
+                                        "type": "string"
+                                    },
+                                    "likeable_type": {
+                                        "description": "gym_media, etc.",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    }
+                }
+            }
+        },
+        "/api/gym/interaction/comment": {
+            "post": {
+                "tags": [
+                    "Interactions"
+                ],
+                "summary": "Add a comment or reply",
+                "operationId": "e0a4cdbc585a20353293029f75d5a575",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "commentable_id": {
+                                        "type": "string"
+                                    },
+                                    "commentable_type": {
+                                        "description": "gym_media, etc.",
+                                        "type": "string"
+                                    },
+                                    "content": {
+                                        "type": "string"
+                                    },
+                                    "parent_id": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Comment created"
+                    }
+                }
+            }
+        },
+        "/api/gym/interaction/comments": {
+            "get": {
+                "tags": [
+                    "Interactions"
+                ],
+                "summary": "Get comments for a media or other interactable",
+                "operationId": "7951fc6cc70e1eb109c6a4ae422fecef",
+                "parameters": [
+                    {
+                        "name": "commentable_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "commentable_type",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation"
+                    }
+                }
+            }
+        },
         "/user-app/gyms": {
             "get": {
                 "tags": [
@@ -2771,6 +2946,14 @@
         {
             "name": "Gym App: Provisions",
             "description": "Gym App: Provisions"
+        },
+        {
+            "name": "Discovery",
+            "description": "Discovery"
+        },
+        {
+            "name": "Interactions",
+            "description": "Interactions"
         },
         {
             "name": "User App: Gym Discovery",

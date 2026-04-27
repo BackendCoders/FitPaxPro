@@ -14,7 +14,11 @@ class Like extends Model
 
     protected $table = 'likes';
 
-    protected $guarded = [];
+    protected $fillable = [
+        'user_id',
+        'likeable_type',
+        'likeable_id',
+    ];
 
     protected $casts = [
         'created_at' => 'datetime',

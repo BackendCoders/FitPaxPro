@@ -38,4 +38,14 @@ class GymGalleryMedia extends Model
         
         return asset('storage/' . $value);
     }
+
+    public function likes(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(Like::class, 'likeable');
+    }
+
+    public function comments(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(Comment::class, 'commentable');
+    }
 }
