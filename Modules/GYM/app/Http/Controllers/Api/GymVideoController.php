@@ -11,7 +11,7 @@ class GymVideoController extends Controller
 {
     /**
      * @OA\Get(
-     *     path="/gym/videos",
+     *     path="/user-app/gym/videos",
      *     summary="Get all gym YouTube videos with filters",
      *     tags={"Discovery"},
      *     @OA\Parameter(name="search", in="query", description="Search by video title or gym name", @OA\Schema(type="string")),

@@ -12,8 +12,18 @@ use Modules\GYM\app\Http\Controllers\Api\GymPlanController;
 |--------------------------------------------------------------------------
 */
 
-// Public Discovery APIs
-Route::get('gym/videos', [\Modules\GYM\app\Http\Controllers\Api\GymVideoController::class, 'index']);
+// USER-APP API PROTOCOLS (Discovery & Interactions)
+Route::prefix('user-app')->group(function () {
+    Route::get('gym/videos', [\Modules\GYM\app\Http\Controllers\Api\GymVideoController::class, 'index']);
+    
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::prefix('interaction')->group(function () {
+            Route::post('like', [\Modules\GYM\app\Http\Controllers\Api\InteractionController::class, 'toggleLike']);
+            Route::post('comment', [\Modules\GYM\app\Http\Controllers\Api\InteractionController::class, 'storeComment']);
+            Route::get('comments', [\Modules\GYM\app\Http\Controllers\Api\InteractionController::class, 'getComments']);
+        });
+    });
+});
 
 Route::prefix('gym')->group(function () {
     // Identity Protocols
@@ -61,12 +71,5 @@ Route::prefix('gym')->group(function () {
 
         Route::get('{id}', [GymController::class, 'show']);
         Route::put('{id}', [GymController::class, 'update']);
-
-        // Interaction Hub (Likes & Comments)
-        Route::prefix('interaction')->group(function () {
-            Route::post('like', [\Modules\GYM\app\Http\Controllers\Api\InteractionController::class, 'toggleLike']);
-            Route::post('comment', [\Modules\GYM\app\Http\Controllers\Api\InteractionController::class, 'storeComment']);
-            Route::get('comments', [\Modules\GYM\app\Http\Controllers\Api\InteractionController::class, 'getComments']);
-        });
     });
 });

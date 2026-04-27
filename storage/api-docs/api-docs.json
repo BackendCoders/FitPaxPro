@@ -2142,13 +2142,13 @@
                 ]
             }
         },
-        "/gym/videos": {
+        "/user-app/gym/videos": {
             "get": {
                 "tags": [
                     "Discovery"
                 ],
                 "summary": "Get all gym YouTube videos with filters",
-                "operationId": "9a92746a2d2831713dffb9a00d7cf3e0",
+                "operationId": "e07d15a085d02c2256fb8527b84b9bbb",
                 "parameters": [
                     {
                         "name": "search",
@@ -2198,13 +2198,13 @@
                 }
             }
         },
-        "/gym/interaction/like": {
+        "/user-app/interaction/like": {
             "post": {
                 "tags": [
                     "Interactions"
                 ],
                 "summary": "Toggle like/unlike for a media or other interactable",
-                "operationId": "4d9c06fb73af2711cace7ce640ae3aca",
+                "operationId": "b681803824d8374636cb99c740b22db6",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -2231,13 +2231,13 @@
                 }
             }
         },
-        "/gym/interaction/comment": {
+        "/user-app/interaction/comment": {
             "post": {
                 "tags": [
                     "Interactions"
                 ],
                 "summary": "Add a comment or reply",
-                "operationId": "18e17fa8dba62ef528781cb61b13f04c",
+                "operationId": "001d6ece4629115e2b543e5dccd1d3f4",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -2271,13 +2271,13 @@
                 }
             }
         },
-        "/gym/interaction/comments": {
+        "/user-app/interaction/comments": {
             "get": {
                 "tags": [
                     "Interactions"
                 ],
                 "summary": "Get comments for a media or other interactable",
-                "operationId": "8037e385164e9ee4c93f38f50f57efa2",
+                "operationId": "b1eab3c1b055adb1a07f686c2a7894c6",
                 "parameters": [
                     {
                         "name": "commentable_id",

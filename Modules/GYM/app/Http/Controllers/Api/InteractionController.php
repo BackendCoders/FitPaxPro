@@ -13,7 +13,7 @@ class InteractionController extends Controller
 {
     /**
      * @OA\Post(
-     *     path="/gym/interaction/like",
+     *     path="/user-app/interaction/like",
      *     summary="Toggle like/unlike for a media or other interactable",
      *     tags={"Interactions"},
      *     @OA\RequestBody(
@@ -71,7 +71,7 @@ class InteractionController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/gym/interaction/comment",
+     *     path="/user-app/interaction/comment",
      *     summary="Add a comment or reply",
      *     tags={"Interactions"},
      *     @OA\RequestBody(
@@ -116,7 +116,7 @@ class InteractionController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/gym/interaction/comments",
+     *     path="/user-app/interaction/comments",
      *     summary="Get comments for a media or other interactable",
      *     tags={"Interactions"},
      *     @OA\Parameter(name="commentable_id", in="query", required=true, @OA\Schema(type="string")),
