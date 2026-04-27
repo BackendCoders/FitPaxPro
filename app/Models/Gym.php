@@ -15,7 +15,7 @@ class Gym extends Model
 {
     use HasFactory, HasUuid, SoftDeletes, HasCustomFields;
 
-    protected $appends = ['custom_fields_data', 'image_url', 'completion_progress'];
+    protected $appends = ['custom_fields_data', 'image_url', 'completion_progress', 'youtube_video_links'];
 
     public function getCompletionProgressAttribute()
     {
@@ -96,6 +96,11 @@ class Gym extends Model
         return $this->hasMany(GymGalleryMedia::class);
     }
 
+    public function videoMedia(): HasMany
+    {
+        return $this->hasMany(GymGalleryMedia::class)->where('file_type', 'youtube');
+    }
+
     public function reviews(): HasMany
     {
         return $this->hasMany(GymReview::class);
@@ -132,5 +137,20 @@ class Gym extends Model
         }
 
         return asset('storage/' . $this->image);
+    }
+
+    public function getYoutubeVideoLinksAttribute()
+    {
+        $videos = $this->relationLoaded('videoMedia')
+            ? $this->videoMedia
+            : $this->videoMedia()->get();
+
+        return $videos->map(function (GymGalleryMedia $media) {
+            return [
+                'id' => $media->id,
+                'title' => $media->file_name,
+                'url' => $media->file_path,
+            ];
+        })->values();
     }
 }

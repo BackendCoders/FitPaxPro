@@ -76,6 +76,11 @@ class GYMController extends Controller
             'address' => 'required|string',
             'member_count_limit' => 'nullable|integer',
             'platform_plan_id' => 'nullable|exists:platform_subscription_plans,id',
+            'image' => 'nullable|image|max:5120',
+            'gallery' => 'nullable|array',
+            'gallery.*' => 'image|max:5120',
+            'youtube_links' => 'nullable|array',
+            'youtube_links.*' => 'nullable|url',
             'template_ids' => 'nullable|array',
             'template_ids.*' => 'exists:membership_plan_templates,id',
             'custom_plans' => 'nullable|array',
@@ -88,31 +93,15 @@ class GYMController extends Controller
         $dynamicRules = \App\Models\Gym::getCustomFieldRules(\App\Models\Gym::class);
         $request->validate(array_merge($rules, $dynamicRules));
 
-        $data = $request->except(['template_ids', 'custom_plans', 'category_ids', 'custom_fields']);
+        $data = $request->except(['template_ids', 'custom_plans', 'category_ids', 'custom_fields', 'image', 'gallery', 'youtube_links']);
         $data['owner_id'] = auth()->id(); 
 
-        $gym = $this->gymRepository->createGym($data);
-
-        // 0. Handle Primary Image
-        if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('gyms', 'public');
-            $gym->update(['image' => $path]);
-        }
-
-        // 0.1 Handle Gallery
-        if ($request->hasFile('gallery')) {
-            foreach ($request->file('gallery') as $file) {
-                $path = $file->store('gyms/gallery', 'public');
-                \App\Models\GymGalleryMedia::create([
-                    'gym_id' => $gym->id,
-                    'file_path' => $path,
-                    'file_type' => 'image',
-                    'file_size' => $file->getSize(),
-                    'file_name' => $file->getClientOriginalName(),
-                    'mime_type' => $file->getClientMimeType(),
-                ]);
-            }
-        }
+        $gym = $this->gymRepository->createGym(
+            $data,
+            $request->file('image'),
+            $request->file('gallery', []),
+            $request->input('youtube_links', [])
+        );
 
         // 1. Link selected master templates
         if ($request->has('template_ids')) {
@@ -175,7 +164,7 @@ class GYMController extends Controller
     public function mediaSettings($uuid)
     {
         $gym = $this->gymRepository->getGymById($uuid);
-        $gym->load('galleryMedia');
+        $gym->load(['galleryMedia', 'videoMedia']);
         return view('gym::media_settings', compact('gym'));
     }
 
@@ -233,25 +222,20 @@ class GYMController extends Controller
     public function updateMedia(Request $request, $uuid)
     {
         $gym = $this->gymRepository->getGymById($uuid);
+        $request->validate([
+            'image' => 'nullable|image|max:5120',
+            'gallery' => 'nullable|array',
+            'gallery.*' => 'image|max:5120',
+            'youtube_links' => 'nullable|array',
+            'youtube_links.*' => 'nullable|url',
+        ]);
         
-        if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('gyms', 'public');
-            $gym->update(['image' => $path]);
-        }
-
-        if ($request->hasFile('gallery')) {
-            foreach ($request->file('gallery') as $file) {
-                $path = $file->store('gyms/gallery', 'public');
-                \App\Models\GymGalleryMedia::create([
-                    'gym_id' => $gym->id,
-                    'file_path' => $path,
-                    'file_type' => 'image',
-                    'file_size' => $file->getSize(),
-                    'file_name' => $file->getClientOriginalName(),
-                    'mime_type' => $file->getClientMimeType(),
-                ]);
-            }
-        }
+        $this->gymRepository->uploadNodeAssets(
+            $gym,
+            $request->file('image'),
+            $request->file('gallery', []),
+            $request->input('youtube_links', [])
+        );
 
         return back()->with('success', 'Media portfolio updated successfully.');
     }
@@ -299,9 +283,21 @@ class GYMController extends Controller
         ];
 
         $dynamicRules = \App\Models\Gym::getCustomFieldRules(\App\Models\Gym::class);
-        $request->validate(array_merge($rules, $dynamicRules));
+        $request->validate(array_merge($rules, $dynamicRules, [
+            'image' => 'nullable|image|max:5120',
+            'gallery' => 'nullable|array',
+            'gallery.*' => 'image|max:5120',
+            'youtube_links' => 'nullable|array',
+            'youtube_links.*' => 'nullable|url',
+        ]));
 
-        $this->gymRepository->updateGym($uuid, $request->except(['category_ids', 'custom_fields']));
+        $this->gymRepository->updateGym(
+            $uuid,
+            $request->except(['category_ids', 'custom_fields', 'image', 'gallery', 'youtube_links']),
+            $request->file('image'),
+            $request->file('gallery', []),
+            $request->input('youtube_links', [])
+        );
 
         if ($request->has('custom_fields')) {
             $gym->saveCustomFields($request->custom_fields);

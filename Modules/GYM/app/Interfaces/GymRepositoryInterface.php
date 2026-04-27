@@ -2,6 +2,8 @@
 
 namespace Modules\GYM\app\Interfaces;
 
+use Illuminate\Http\UploadedFile;
+
 interface GymRepositoryInterface
 {
     /**
@@ -25,7 +27,7 @@ interface GymRepositoryInterface
      * @param array $data
      * @return \App\Models\Gym
      */
-    public function createGym(array $data);
+    public function createGym(array $data, ?UploadedFile $image = null, array $gallery = [], array $youtubeLinks = []);
 
     /**
      * Update an existing gym.
@@ -34,7 +36,7 @@ interface GymRepositoryInterface
      * @param array $data
      * @return \App\Models\Gym|null
      */
-    public function updateGym(string $uuid, array $data);
+    public function updateGym(string $uuid, array $data, ?UploadedFile $image = null, array $gallery = [], array $youtubeLinks = []);
 
     /**
      * Delete a gym.
@@ -114,5 +116,5 @@ interface GymRepositoryInterface
     public function verifyOtp(string $email, string $otp);
     public function initiateNode(\App\Models\User $owner, array $data);
     public function syncNodePlans(\App\Models\Gym $gym, ?array $templateIds, ?array $customPlans);
-    public function uploadNodeAssets(\App\Models\Gym $gym, $mainImage, ?array $gallery);
+    public function uploadNodeAssets(\App\Models\Gym $gym, $mainImage, ?array $gallery, array $youtubeLinks = []);
 }

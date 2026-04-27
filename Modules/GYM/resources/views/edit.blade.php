@@ -66,6 +66,10 @@
         .compact-plan.selected { border-color: var(--cc-accent); background: rgba(225, 18, 24, 0.05); }
         .compact-plan h6 { font-size: 0.85rem; margin: 0; font-weight: 600; }
         .compact-plan small { font-size: 0.75rem; color: var(--cc-muted); }
+        .youtube-link-row {
+            background: rgba(255,255,255,0.02); border: 1px solid var(--cc-border);
+            border-radius: 10px; padding: 12px; margin-bottom: 10px; position: relative;
+        }
     </style>
     @endpush
 
@@ -149,6 +153,33 @@
                         </div>
                     </div>
 
+                    <div class="cc-card">
+                        <div class="cc-card-header d-flex justify-content-between">
+                            <div class="d-flex align-items-center gap-2">
+                                <iconify-icon icon="tabler:brand-youtube"></iconify-icon>
+                                <h6>YouTube Videos</h6>
+                            </div>
+                            <button type="button" class="btn btn-cc-primary btn-sm p-0 px-2" id="add-youtube-link-btn" style="height: 22px; font-size: 10px;">+ ADD LINK</button>
+                        </div>
+                        <div class="cc-card-body">
+                            <div id="youtube-links-container">
+                                @php
+                                    $youtubeLinks = old('youtube_links', collect($gym->youtube_video_links ?? [])->pluck('url')->all());
+                                    if (empty($youtubeLinks)) {
+                                        $youtubeLinks = [''];
+                                    }
+                                @endphp
+                                @foreach($youtubeLinks as $link)
+                                <div class="youtube-link-row">
+                                    <button type="button" class="btn-remove remove-link"><iconify-icon icon="tabler:x"></iconify-icon></button>
+                                    <input type="url" name="youtube_links[]" class="form-control form-control-sm" placeholder="https://www.youtube.com/watch?v=..." value="{{ $link }}">
+                                </div>
+                                @endforeach
+                            </div>
+                            <small class="text-white-50">These links will replace the existing YouTube entries when you save the gym.</small>
+                        </div>
+                    </div>
+
                     <x-dynamic-fields model-type="App\Models\Gym" :model="$gym" />
                 </div>
 
@@ -225,6 +256,22 @@
             if (event.target !== cb) cb.checked = !cb.checked;
             cb.closest('.compact-plan').classList.toggle('selected', cb.checked);
         }
+
+        const youtubeLinksContainer = document.getElementById('youtube-links-container');
+        document.getElementById('add-youtube-link-btn').addEventListener('click', () => {
+            const row = document.createElement('div');
+            row.className = 'youtube-link-row';
+            row.innerHTML = `
+                <button type="button" class="btn-remove remove-link"><iconify-icon icon="tabler:x"></iconify-icon></button>
+                <input type="url" name="youtube_links[]" class="form-control form-control-sm" placeholder="https://www.youtube.com/watch?v=...">
+            `;
+            youtubeLinksContainer.appendChild(row);
+            row.querySelector('.remove-link').addEventListener('click', () => row.remove());
+        });
+
+        youtubeLinksContainer.querySelectorAll('.remove-link').forEach(btn => {
+            btn.addEventListener('click', () => btn.closest('.youtube-link-row').remove());
+        });
     </script>
     @endpush
 </x-app-layout>

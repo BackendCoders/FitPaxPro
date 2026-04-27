@@ -81,6 +81,10 @@
             border-radius: 10px; padding: 12px; margin-bottom: 10px; position: relative;
         }
         .btn-remove { position: absolute; right: -8px; top: -8px; background: #E11218; color: white; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; font-size: 10px; border: none; }
+        .youtube-link-row {
+            background: rgba(255,255,255,0.02); border: 1px solid var(--cc-border);
+            border-radius: 10px; padding: 12px; margin-bottom: 10px; position: relative;
+        }
 
         /* Action Bar */
         .bottom-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px; margin-bottom: 50px; }
@@ -182,6 +186,29 @@
                                     <!-- Dynamic Gallery Previews -->
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    <div class="cc-card">
+                        <div class="cc-card-header d-flex justify-content-between">
+                            <div class="d-flex align-items-center gap-2">
+                                <iconify-icon icon="tabler:brand-youtube"></iconify-icon>
+                                <h6>YouTube Videos</h6>
+                            </div>
+                            <button type="button" class="btn btn-cc-primary btn-sm p-0 px-2" id="add-youtube-link-btn" style="height: 22px; font-size: 10px;">+ ADD LINK</button>
+                        </div>
+                        <div class="cc-card-body">
+                            <div id="youtube-links-container">
+                                @php
+                                    $youtubeLinks = old('youtube_links', ['']);
+                                @endphp
+                                @foreach($youtubeLinks as $link)
+                                <div class="youtube-link-row">
+                                    <input type="url" name="youtube_links[]" class="form-control form-control-sm" placeholder="https://www.youtube.com/watch?v=..." value="{{ $link }}">
+                                </div>
+                                @endforeach
+                            </div>
+                            <small class="text-white-50">Add one or more public YouTube URLs. These will be stored with the gym media.</small>
                         </div>
                     </div>
 
@@ -382,6 +409,7 @@
         let planIndex = 0;
         const container = document.getElementById('custom-plans-container');
         const template = document.getElementById('custom-plan-template').innerHTML;
+        const youtubeLinksContainer = document.getElementById('youtube-links-container');
 
         document.getElementById('add-custom-plan-btn').addEventListener('click', () => {
             const html = template.replace(/INDEX/g, planIndex);
@@ -391,6 +419,17 @@
             container.appendChild(node);
             node.querySelector('.remove-plan').addEventListener('click', () => node.remove());
             planIndex++;
+        });
+
+        document.getElementById('add-youtube-link-btn').addEventListener('click', () => {
+            const row = document.createElement('div');
+            row.className = 'youtube-link-row';
+            row.innerHTML = `
+                <button type="button" class="btn-remove remove-link"><iconify-icon icon="tabler:x"></iconify-icon></button>
+                <input type="url" name="youtube_links[]" class="form-control form-control-sm" placeholder="https://www.youtube.com/watch?v=...">
+            `;
+            youtubeLinksContainer.appendChild(row);
+            row.querySelector('.remove-link').addEventListener('click', () => row.remove());
         });
     </script>
     @endpush

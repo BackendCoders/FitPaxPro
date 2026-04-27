@@ -19,6 +19,11 @@ class UpdateGymRequest extends FormRequest
             'address' => 'nullable|string',
             'member_count_limit' => 'nullable|integer',
             'platform_plan_id' => 'nullable|exists:platform_subscription_plans,id',
+            'image' => 'nullable|image|max:5120',
+            'gallery' => 'nullable|array',
+            'gallery.*' => 'image|max:5120',
+            'youtube_links' => 'nullable|array',
+            'youtube_links.*' => 'nullable|url',
             'custom_fields' => 'nullable|array',
         ];
     }

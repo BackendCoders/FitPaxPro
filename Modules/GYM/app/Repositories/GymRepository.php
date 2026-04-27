@@ -3,6 +3,8 @@
 namespace Modules\GYM\app\Repositories;
 
 use App\Models\Gym;
+use App\Models\GymGalleryMedia;
+use Illuminate\Http\UploadedFile;
 use Modules\GYM\app\Interfaces\GymRepositoryInterface;
 
 class GymRepository implements GymRepositoryInterface
@@ -34,7 +36,7 @@ class GymRepository implements GymRepositoryInterface
      * @param array $data
      * @return \App\Models\Gym
      */
-    public function createGym(array $data)
+    public function createGym(array $data, ?UploadedFile $image = null, array $gallery = [], array $youtubeLinks = [])
     {
         $gym = Gym::create($data);
         
@@ -43,6 +45,8 @@ class GymRepository implements GymRepositoryInterface
                 $gym->feePlans()->create($plan);
             }
         }
+
+        $this->syncMedia($gym, $image, $gallery, $youtubeLinks);
         
         return $gym;
     }
@@ -54,7 +58,7 @@ class GymRepository implements GymRepositoryInterface
      * @param array $data
      * @return \App\Models\Gym|null
      */
-    public function updateGym(string $uuid, array $data)
+    public function updateGym(string $uuid, array $data, ?UploadedFile $image = null, array $gallery = [], array $youtubeLinks = [])
     {
         $gym = $this->getGymById($uuid);
         if ($gym) {
@@ -67,6 +71,8 @@ class GymRepository implements GymRepositoryInterface
                     $gym->feePlans()->create($plan);
                 }
             }
+
+            $this->syncMedia($gym, $image, $gallery, $youtubeLinks);
             
             return $gym;
         }
@@ -252,26 +258,57 @@ class GymRepository implements GymRepositoryInterface
         return $gym->load('feePlans');
     }
 
-    public function uploadNodeAssets(Gym $gym, $mainImage, ?array $gallery)
+    public function uploadNodeAssets(Gym $gym, $mainImage, ?array $gallery, array $youtubeLinks = [])
     {
-        if ($mainImage) {
-            $gym->update(['image' => $mainImage->store('gyms', 'public')]);
+        $this->syncMedia($gym, $mainImage, $gallery ?? [], $youtubeLinks);
+
+        return $gym->load(['galleryMedia', 'videoMedia']);
+    }
+
+    /**
+     * Sync gym media assets including main image, gallery and YouTube videos.
+     */
+    protected function syncMedia(Gym $gym, ?UploadedFile $image = null, array $gallery = [], array $youtubeLinks = []): void
+    {
+        if ($image) {
+            $gym->update(['image' => $image->store('gyms', 'public')]);
         }
 
-        if ($gallery) {
-            foreach ($gallery as $file) {
-                $path = $file->store('gyms/gallery', 'public');
-                \App\Models\GymGalleryMedia::create([
+        foreach ($gallery as $file) {
+            if (! $file instanceof UploadedFile) {
+                continue;
+            }
+
+            $path = $file->store('gyms/gallery', 'public');
+            GymGalleryMedia::create([
+                'gym_id' => $gym->id,
+                'file_path' => $path,
+                'file_type' => 'image',
+                'file_size' => $file->getSize(),
+                'file_name' => $file->getClientOriginalName(),
+                'mime_type' => $file->getClientMimeType(),
+            ]);
+        }
+
+        if (! empty($youtubeLinks)) {
+            $gym->galleryMedia()->where('file_type', 'youtube')->delete();
+
+            foreach ($youtubeLinks as $link) {
+                $url = is_array($link) ? ($link['url'] ?? $link['link'] ?? null) : $link;
+
+                if (! $url) {
+                    continue;
+                }
+
+                GymGalleryMedia::create([
                     'gym_id' => $gym->id,
-                    'file_path' => $path,
-                    'file_type' => 'image',
-                    'file_size' => $file->getSize(),
-                    'file_name' => $file->getClientOriginalName(),
-                    'mime_type' => $file->getClientMimeType(),
+                    'file_path' => $url,
+                    'file_type' => 'youtube',
+                    'file_name' => is_array($link) ? ($link['title'] ?? 'YouTube Video') : 'YouTube Video',
+                    'mime_type' => 'text/url',
+                    'is_main_video' => false,
                 ]);
             }
         }
-
-        return $gym->load('galleryMedia');
     }
 }

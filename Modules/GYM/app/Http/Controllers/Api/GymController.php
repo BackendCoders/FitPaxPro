@@ -60,6 +60,7 @@ class GymController extends Controller
      *             @OA\Property(property="email", type="string", format="email", example="hq@ironforce.com"),
      *             @OA\Property(property="phone", type="string", example="+919876543210"),
      *             @OA\Property(property="address", type="string", example="123 Tactical Street, Gym District"),
+     *             @OA\Property(property="youtube_links", type="array", @OA\Items(type="string", example="https://www.youtube.com/watch?v=dQw4w9WgXcQ")),
      *             @OA\Property(property="member_count_limit", type="integer", example=500),
      *             @OA\Property(property="platform_plan_id", type="string", example="uuid-here"),
      *             @OA\Property(property="template_ids", type="array", @OA\Items(type="string")),
@@ -90,6 +91,7 @@ class GymController extends Controller
     {
         try {
             $data = $request->validated();
+            unset($data['custom_fields'], $data['image'], $data['gallery'], $data['youtube_links']);
 
             $data['owner_id'] = auth()->id() ?? $request->owner_id;
 
@@ -100,29 +102,13 @@ class GymController extends Controller
                 ], 401);
             }
 
-            // Create primary node
-            $gym = $this->gymRepository->createGym($request->except(['template_ids', 'custom_plans', 'custom_fields', 'gallery', 'image']));
-
-            // 1. Handle Primary Image Signal
-            if ($request->hasFile('image')) {
-                $path = $request->file('image')->store('gyms', 'public');
-                $gym->update(['image' => $path]);
-            }
-
-            // 2. Handle Operative Gallery
-            if ($request->hasFile('gallery')) {
-                foreach ($request->file('gallery') as $file) {
-                    $path = $file->store('gyms/gallery', 'public');
-                    \App\Models\GymGalleryMedia::create([
-                        'gym_id' => $gym->id,
-                        'file_path' => $path,
-                        'file_type' => 'image',
-                        'file_size' => $file->getSize(),
-                        'file_name' => $file->getClientOriginalName(),
-                        'mime_type' => $file->getClientMimeType(),
-                    ]);
-                }
-            }
+            // Create primary node and persist media via repository
+            $gym = $this->gymRepository->createGym(
+                $request->except(['template_ids', 'custom_plans', 'custom_fields', 'gallery', 'image', 'youtube_links']),
+                $request->file('image'),
+                $request->file('gallery', []),
+                $request->input('youtube_links', [])
+            );
 
             // 3. Sync Platform Blueprints (Templates)
             if ($request->has('template_ids')) {
@@ -173,7 +159,7 @@ class GymController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Gym infrastructure node provisioned successfully with all operational assets.',
-                'data' => $gym->load(['owner', 'platformPlan', 'feePlans', 'galleryMedia'])
+                'data' => $gym->load(['owner', 'platformPlan', 'feePlans', 'galleryMedia', 'videoMedia'])
             ], 201);
 
         } catch (\Exception $e) {
@@ -208,6 +194,7 @@ class GymController extends Controller
      *             @OA\Property(property="email", type="string", format="email", example="hq@ironforce.com"),
      *             @OA\Property(property="phone", type="string", example="+919876543210"),
      *             @OA\Property(property="address", type="string", example="123 Tactical Street, Gym Sector 4"),
+     *             @OA\Property(property="youtube_links", type="array", @OA\Items(type="string", example="https://www.youtube.com/watch?v=dQw4w9WgXcQ")),
      *             @OA\Property(property="member_count_limit", type="integer", example=1000),
      *             @OA\Property(property="platform_plan_id", type="string", example="uuid-tier-id"),
      *             @OA\Property(property="custom_fields", type="object", example={"color_code": "#FF0000", "branch_id": "BRANCH-01"})
@@ -240,24 +227,24 @@ class GymController extends Controller
                 ], 403);
             }
 
-            // Sync Core Data
-            $this->gymRepository->updateGym($id, $data);
+            // Sync Core Data and media via repository
+            $this->gymRepository->updateGym(
+                $id,
+                $data,
+                $request->file('image'),
+                $request->file('gallery', []),
+                $request->input('youtube_links', [])
+            );
 
             // Handle Dynamic Fields Signal
             if ($request->has('custom_fields')) {
                 $gym->saveCustomFields($request->custom_fields);
             }
 
-            // Handle Image Calibration
-            if ($request->hasFile('image')) {
-                $path = $request->file('image')->store('gyms', 'public');
-                $gym->update(['image' => $path]);
-            }
-
             return response()->json([
                 'success' => true,
                 'message' => 'Gym profile calibrated successfully.',
-                'data' => $gym->fresh(['owner', 'platformPlan', 'feePlans'])
+                'data' => $gym->fresh(['owner', 'platformPlan', 'feePlans', 'videoMedia', 'galleryMedia'])
             ]);
 
         } catch (\Exception $e) {
@@ -330,7 +317,7 @@ class GymController extends Controller
             $gym = $this->gymRepository->getGymById($id);
             return response()->json([
                 'success' => true,
-                'data' => $gym->load(['owner', 'platformPlan', 'feePlans', 'galleryMedia'])
+                'data' => $gym->load(['owner', 'platformPlan', 'feePlans', 'galleryMedia', 'videoMedia'])
             ]);
         } catch (\Exception $e) {
             return response()->json([

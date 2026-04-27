@@ -13,6 +13,18 @@
             opacity: 0; transition: 0.3s; cursor: pointer;
         }
         .gallery-item:hover .delete-overlay { opacity: 1; }
+        .youtube-list { display: grid; gap: 10px; }
+        .youtube-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 12px 14px;
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
         .media-dropzone {
             border: 2px dashed rgba(255,255,255,0.1); border-radius: 15px; padding: 40px;
@@ -80,6 +92,75 @@
                     </div>
                 </form>
             </div>
+
+            <div class="portfolio-card mt-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h6 class="text-white fw-bold mb-0 uppercase fs-12 letter-spacing-1">YouTube Videos ({{ $gym->videoMedia->count() }} Links)</h6>
+                </div>
+
+                <div class="youtube-list mb-4">
+                    @forelse($gym->videoMedia as $video)
+                    <a href="{{ $video->file_path }}" target="_blank" rel="noopener noreferrer" class="youtube-item">
+                        <iconify-icon icon="tabler:brand-youtube" class="text-danger fs-20"></iconify-icon>
+                        <span>{{ $video->file_name ?? $video->file_path }}</span>
+                    </a>
+                    @empty
+                    <p class="text-white-50 mb-0">No YouTube links added yet.</p>
+                    @endforelse
+                </div>
+
+                <form action="{{ route('gym.media.update', $gym->id) }}" method="POST">
+                    @csrf
+                    @php
+                        $youtubeLinks = old('youtube_links', collect($gym->youtube_video_links ?? [])->pluck('url')->all());
+                        if (empty($youtubeLinks)) {
+                            $youtubeLinks = [''];
+                        }
+                    @endphp
+                    <div id="media-youtube-links-container">
+                        @foreach($youtubeLinks as $link)
+                        <div class="row g-2 align-items-center mb-2">
+                            <div class="col-11">
+                                <input type="url" name="youtube_links[]" class="form-control bg-dark border-0 text-white" placeholder="https://www.youtube.com/watch?v=..." value="{{ $link }}">
+                            </div>
+                            <div class="col-1 text-end">
+                                <button type="button" class="btn btn-outline-danger btn-sm remove-video-link">&times;</button>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-outline-light btn-sm" id="add-media-youtube-link">+ Add Link</button>
+                        <button type="submit" class="btn btn-primary btn-sm">Save YouTube Links</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
+
+    @push('scripts')
+    <script>
+        const youtubeLinksContainer = document.getElementById('media-youtube-links-container');
+        const addYoutubeButton = document.getElementById('add-media-youtube-link');
+
+        addYoutubeButton?.addEventListener('click', () => {
+            const row = document.createElement('div');
+            row.className = 'row g-2 align-items-center mb-2';
+            row.innerHTML = `
+                <div class="col-11">
+                    <input type="url" name="youtube_links[]" class="form-control bg-dark border-0 text-white" placeholder="https://www.youtube.com/watch?v=...">
+                </div>
+                <div class="col-1 text-end">
+                    <button type="button" class="btn btn-outline-danger btn-sm remove-video-link">&times;</button>
+                </div>
+            `;
+            youtubeLinksContainer.appendChild(row);
+            row.querySelector('.remove-video-link').addEventListener('click', () => row.remove());
+        });
+
+        youtubeLinksContainer?.querySelectorAll('.remove-video-link').forEach(btn => {
+            btn.addEventListener('click', () => btn.closest('.row').remove());
+        });
+    </script>
+    @endpush
 </x-app-layout>
