@@ -46,6 +46,10 @@ class UsersServiceProvider extends ServiceProvider
             \Modules\Users\app\Interfaces\GymListingRepositoryInterface::class,
             \Modules\Users\app\Repositories\GymListingRepository::class
         );
+        $this->app->bind(
+            \Modules\Users\app\Interfaces\UserProfileRepositoryInterface::class,
+            \Modules\Users\app\Repositories\UserProfileRepository::class
+        );
     }
 
     /**

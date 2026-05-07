@@ -2915,6 +2915,154 @@
                     }
                 }
             }
+        },
+        "/user-app/profile": {
+            "get": {
+                "tags": [
+                    "User App: Profile"
+                ],
+                "summary": "Get the full profile of the authenticated user",
+                "description": "Fetches comprehensive user data including name, phone, and detailed health/fitness profile.",
+                "operationId": "39b1c22d67877af89240dec14daf8b4e",
+                "responses": {
+                    "200": {
+                        "description": "User profile data retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "User App: Profile"
+                ],
+                "summary": "Update the profile of the authenticated user",
+                "description": "Updates user basic information and health/fitness profile fields.",
+                "operationId": "b56a8930e5b1b015b5ef3d2d9289f29d",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "+919876543210"
+                                    },
+                                    "gender": {
+                                        "type": "string",
+                                        "enum": [
+                                            "male",
+                                            "female",
+                                            "other",
+                                            "prefer_not_to_say"
+                                        ]
+                                    },
+                                    "age": {
+                                        "type": "integer",
+                                        "example": 25
+                                    },
+                                    "date_of_birth": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "1999-01-01"
+                                    },
+                                    "current_weight": {
+                                        "type": "number",
+                                        "example": 75.5
+                                    },
+                                    "target_weight": {
+                                        "type": "number",
+                                        "example": 70
+                                    },
+                                    "height": {
+                                        "type": "number",
+                                        "example": 180
+                                    },
+                                    "goal_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "weight_gain",
+                                            "weight_loss",
+                                            "maintenance",
+                                            "muscle_building"
+                                        ]
+                                    },
+                                    "diet_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "veg",
+                                            "non_veg",
+                                            "eggitarian",
+                                            "vegan",
+                                            "keto",
+                                            "paleo"
+                                        ]
+                                    },
+                                    "is_public": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Profile updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Profile updated successfully."
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
         }
     },
     "components": {

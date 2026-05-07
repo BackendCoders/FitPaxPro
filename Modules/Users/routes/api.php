@@ -19,6 +19,7 @@ Route::middleware('auth:api')->get('/users', function (Request $request) {
 
 use Modules\Users\app\Http\Controllers\Api\UserAppRegistrationController;
 use Modules\Users\app\Http\Controllers\Api\UserAppProfileController;
+use Modules\Users\app\Http\Controllers\Api\UserProfileController;
 use Modules\Users\app\Http\Controllers\Api\GymListingController;
 use Modules\Users\app\Http\Controllers\Api\UserAppDiscoveryController;
 
@@ -40,6 +41,10 @@ Route::prefix('user-app')->group(function () {
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/auth/me', [UserAppProfileController::class, 'me']);
+        
+        // Comprehensive Profile APIs
+        Route::get('/profile', [UserProfileController::class, 'show']);
+        Route::post('/profile', [UserProfileController::class, 'update']);
         
         Route::post('/registration/step-2', [UserAppRegistrationController::class, 'step2']);
         Route::post('/registration/step-3', [UserAppRegistrationController::class, 'step3']);
