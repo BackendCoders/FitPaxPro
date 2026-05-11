@@ -48,7 +48,26 @@ class ExerciseLibraryItem extends Model
         $path = str_replace('\\', '/', trim($this->image_path));
 
         if (filter_var($path, FILTER_VALIDATE_URL)) {
+            $parsedPath = parse_url($path, PHP_URL_PATH) ?: '';
+            $storageSegment = '/storage/';
+
+            if (str_contains($parsedPath, $storageSegment)) {
+                $relativePath = ltrim(substr($parsedPath, strpos($parsedPath, $storageSegment) + strlen($storageSegment)), '/');
+
+                if ($relativePath !== '') {
+                    return route('exercise-library.media', ['path' => $relativePath]);
+                }
+            }
+
             return $path;
+        }
+
+        if (str_starts_with($path, 'storage/')) {
+            $relativePath = ltrim(substr($path, strlen('storage/')), '/');
+
+            if ($relativePath !== '') {
+                return route('exercise-library.media', ['path' => $relativePath]);
+            }
         }
 
         $disk = Storage::disk('public');
