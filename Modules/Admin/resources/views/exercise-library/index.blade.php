@@ -680,6 +680,7 @@
                 const formData = new FormData();
                 files.forEach(file => {
                     formData.append('import_files[]', file, file.webkitRelativePath || file.name);
+                    formData.append('import_paths[]', file.webkitRelativePath || file.name);
                 });
                 formData.append('_token', '{{ csrf_token() }}');
 
@@ -693,11 +694,15 @@
                     }
                 };
 
+                xhr.onloadstart = function () {
+                    setProgress(0, `Starting folder upload for ${files.length} files...`);
+                };
+
                 xhr.onload = function () {
                     const payload = xhr.response || {};
 
                     if (xhr.status >= 200 && xhr.status < 300 && payload.success) {
-                        setProgress(100, `Imported ${payload.created || 0} records. ${payload.skipped || 0} skipped.`);
+                        setProgress(100, `Imported ${payload.created || 0} records. ${payload.skipped || 0} skipped. Processing complete.`);
                         if (payload.errors && payload.errors.length) {
                             console.warn('Exercise import warnings:', payload.errors);
                         }
@@ -705,7 +710,10 @@
                             window.location.reload();
                         }, 700);
                     } else {
-                        setProgress(0, payload.message || 'Import failed.');
+                        setProgress(0, payload.message || `Import failed with HTTP ${xhr.status}.`);
+                        if (payload.errors && payload.errors.length) {
+                            status.innerHTML = `${escapeHtml(payload.message || 'Import failed.')}<br><span style="text-transform:none;letter-spacing:0;display:block;margin-top:8px;color:rgba(255,255,255,0.35);">${escapeHtml(payload.errors[0])}</span>`;
+                        }
                         importButton.disabled = false;
                         fileInput.disabled = false;
                     }
@@ -713,6 +721,12 @@
 
                 xhr.onerror = function () {
                     setProgress(0, 'Upload failed. Please try again.');
+                    importButton.disabled = false;
+                    fileInput.disabled = false;
+                };
+
+                xhr.onabort = function () {
+                    setProgress(0, 'Upload cancelled.');
                     importButton.disabled = false;
                     fileInput.disabled = false;
                 };

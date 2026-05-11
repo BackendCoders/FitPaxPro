@@ -84,15 +84,26 @@ class ExerciseLibraryController extends Controller
     {
         $request->validate([
             'import_files' => 'required|array|min:1',
-            'import_files.*' => 'required|file|max:20480',
+            'import_paths' => 'nullable|array',
         ]);
 
         $created = 0;
         $skipped = 0;
         $errors = [];
-        $files = collect($request->file('import_files'))
-            ->filter(fn ($file) => $file && $file->isValid())
-            ->sortBy(fn ($file) => $this->normalizeImportPath($file->getClientOriginalName()))
+        $uploadedFiles = collect($request->file('import_files'))->values();
+        $uploadedPaths = collect($request->input('import_paths', []))->values();
+
+        $files = $uploadedFiles
+            ->map(function ($file, $index) use ($uploadedPaths) {
+                $path = (string) ($uploadedPaths[$index] ?? $file->getClientOriginalName());
+
+                return [
+                    'file' => $file,
+                    'path' => $path,
+                ];
+            })
+            ->filter(fn ($entry) => $entry['file'] && $entry['file']->isValid())
+            ->sortBy(fn ($entry) => $this->normalizeImportPath($entry['path']))
             ->values();
 
         $supportedDataExtensions = ['json', 'csv', 'txt'];
@@ -100,13 +111,15 @@ class ExerciseLibraryController extends Controller
         $dataFiles = [];
         $imageFiles = [];
 
-        foreach ($files as $file) {
-            $extension = strtolower($file->getClientOriginalExtension());
+        foreach ($files as $entry) {
+            $file = $entry['file'];
+            $path = $entry['path'];
+            $extension = strtolower($file->getClientOriginalExtension() ?: pathinfo($path, PATHINFO_EXTENSION));
 
             if (in_array($extension, $supportedDataExtensions, true)) {
-                $dataFiles[] = $file;
+                $dataFiles[] = ['file' => $file, 'path' => $path];
             } elseif (in_array($extension, $supportedImageExtensions, true)) {
-                $imageFiles[] = $file;
+                $imageFiles[] = ['file' => $file, 'path' => $path];
             } else {
                 $skipped++;
             }
@@ -115,13 +128,15 @@ class ExerciseLibraryController extends Controller
         $batchToken = now()->format('YmdHis') . '-' . Str::random(8);
         $imageIndex = [];
 
-        foreach ($imageFiles as $position => $imageFile) {
-            $storedPath = $this->storeImportedImage($imageFile, $batchToken, $position);
-            $this->registerImageIndex($imageIndex, $imageFile->getClientOriginalName(), $storedPath);
+        foreach ($imageFiles as $position => $entry) {
+            $storedPath = $this->storeImportedImage($entry['file'], $entry['path'], $batchToken, $position);
+            $this->registerImageIndex($imageIndex, $entry['path'], $storedPath);
         }
 
-        foreach ($dataFiles as $file) {
-            $extension = strtolower($file->getClientOriginalExtension());
+        foreach ($dataFiles as $entry) {
+            $file = $entry['file'];
+            $path = $entry['path'];
+            $extension = strtolower($file->getClientOriginalExtension() ?: pathinfo($path, PATHINFO_EXTENSION));
             $raw = file_get_contents($file->getRealPath());
 
             $rows = match ($extension) {
@@ -129,7 +144,7 @@ class ExerciseLibraryController extends Controller
                 default => $this->parseJsonRows($raw),
             };
 
-            $defaultCategory = $this->deriveCategoryFromPath($file->getClientOriginalName());
+            $defaultCategory = $this->deriveCategoryFromPath($path);
 
             foreach ($rows as $index => $row) {
                 try {
@@ -154,7 +169,7 @@ class ExerciseLibraryController extends Controller
                     $created++;
                 } catch (\Throwable $e) {
                     $skipped++;
-                    $errors[] = $file->getClientOriginalName() . ' :: Row ' . ($index + 1) . ': ' . $e->getMessage();
+                    $errors[] = $path . ' :: Row ' . ($index + 1) . ': ' . $e->getMessage();
                 }
             }
         }
@@ -285,10 +300,10 @@ class ExerciseLibraryController extends Controller
         return str_replace('\\', '/', trim($path));
     }
 
-    private function storeImportedImage($file, string $batchToken, int $position): string
+    private function storeImportedImage($file, string $sourcePath, string $batchToken, int $position): string
     {
-        $relativePath = $this->normalizeImportPath($file->getClientOriginalName());
-        $extension = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: 'jpg');
+        $relativePath = $this->normalizeImportPath($sourcePath);
+        $extension = strtolower(pathinfo($relativePath, PATHINFO_EXTENSION) ?: $file->getClientOriginalExtension() ?: $file->extension() ?: 'jpg');
         $basename = pathinfo($relativePath, PATHINFO_FILENAME);
         $safeName = Str::slug($basename) ?: 'exercise-image';
         $storedName = $position . '-' . Str::random(6) . '-' . $safeName . '.' . $extension;
