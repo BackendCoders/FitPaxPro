@@ -223,6 +223,16 @@
                 </li>
 
                 <li>
+                    <a href="{{ route('admin.exercise-library.index') }}"
+                        class="tp-link {{ request()->routeIs('admin.exercise-library.*') ? 'active' : '' }}">
+                        <span class="nav-icon text-white">
+                            <iconify-icon icon="tabler:photo-scan"></iconify-icon>
+                        </span>
+                        <span class="sidebar-text"> Exercise Library </span>
+                    </a>
+                </li>
+
+                <li>
                     <a href="{{ route('admin.settings.index') }}"
                         class="tp-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
                         <span class="nav-icon text-white">
