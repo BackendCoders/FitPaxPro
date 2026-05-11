@@ -312,12 +312,11 @@ class ExerciseLibraryController extends Controller
     private function storeImportedImage($file, string $sourcePath, string $batchToken, int $position): string
     {
         $relativePath = $this->normalizeImportPath($sourcePath);
-        $extension = strtolower(pathinfo($relativePath, PATHINFO_EXTENSION) ?: $file->getClientOriginalExtension() ?: $file->extension() ?: 'jpg');
-        $basename = pathinfo($relativePath, PATHINFO_FILENAME);
-        $safeName = Str::slug($basename) ?: 'exercise-image';
-        $storedName = $position . '-' . Str::random(6) . '-' . $safeName . '.' . $extension;
+        $relativeDirectory = trim(pathinfo($relativePath, PATHINFO_DIRNAME), '.');
+        $directory = "exercise-library/imports/{$batchToken}" . ($relativeDirectory ? '/' . $relativeDirectory : '');
+        $basename = basename($relativePath);
 
-        return $file->storeAs("exercise-library/imports/{$batchToken}", $storedName, 'public');
+        return $file->storeAs($directory, $basename, 'public');
     }
 
     private function registerImageIndex(array &$index, string $sourcePath, string $storedPath): void
