@@ -1,10 +1,4 @@
 <x-app-layout title="Exercise Library | Admin Command Center">
-    @php
-        $totalExercises = $exercises->count();
-        $activeExercises = $exercises->where('is_active', true)->count();
-        $withImages = $exercises->filter(fn ($item) => !empty($item->image_path))->count();
-    @endphp
-
     <style>
         .exercise-wrapper {
             padding: 20px 0 34px;
@@ -389,6 +383,47 @@
             color: #fff;
             border-color: #E11218;
         }
+
+        .pagination-shell {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 18px;
+            padding: 14px 16px;
+            margin-top: 10px;
+        }
+
+        .pagination-shell .pagination {
+            margin-bottom: 0;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .pagination-shell .page-link {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.75);
+            border-radius: 10px !important;
+            padding: 8px 12px;
+        }
+
+        .pagination-shell .page-link:hover {
+            background: rgba(225,18,24,0.14);
+            border-color: rgba(225,18,24,0.25);
+            color: #fff;
+        }
+
+        .pagination-shell .page-item.active .page-link {
+            background: linear-gradient(90deg, #E11218, #ff5b61);
+            border-color: #E11218;
+            color: #fff;
+        }
+
+        .pagination-shell .page-item.disabled .page-link {
+            background: rgba(255,255,255,0.02);
+            color: rgba(255,255,255,0.28);
+            border-color: rgba(255,255,255,0.03);
+        }
     </style>
 
     <div class="exercise-wrapper container-fluid">
@@ -578,6 +613,12 @@
             </div>
             @endforelse
         </div>
+
+        @if($exercises->hasPages())
+            <div class="pagination-shell">
+                {{ $exercises->links('pagination::bootstrap-5') }}
+            </div>
+        @endif
     </div>
 
     @push('scripts')

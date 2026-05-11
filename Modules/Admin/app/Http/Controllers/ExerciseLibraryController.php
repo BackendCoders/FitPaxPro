@@ -12,11 +12,18 @@ class ExerciseLibraryController extends Controller
 {
     public function index()
     {
+        $totalExercises = ExerciseLibraryItem::count();
+        $activeExercises = ExerciseLibraryItem::where('is_active', true)->count();
+        $withImages = ExerciseLibraryItem::whereNotNull('image_path')
+            ->where('image_path', '!=', '')
+            ->count();
+
         $exercises = ExerciseLibraryItem::orderBy('order_index')
             ->orderBy('exercise_name')
-            ->get();
+            ->paginate(12)
+            ->withQueryString();
 
-        return view('admin::exercise-library.index', compact('exercises'));
+        return view('admin::exercise-library.index', compact('exercises', 'totalExercises', 'activeExercises', 'withImages'));
     }
 
     public function create()
