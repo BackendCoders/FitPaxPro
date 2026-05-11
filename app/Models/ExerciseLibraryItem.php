@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Concerns\HasUuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class ExerciseLibraryItem extends Model
 {
@@ -44,10 +45,54 @@ class ExerciseLibraryItem extends Model
             return null;
         }
 
-        if (filter_var($this->image_path, FILTER_VALIDATE_URL)) {
-            return $this->image_path;
+        $path = str_replace('\\', '/', trim($this->image_path));
+
+        if (filter_var($path, FILTER_VALIDATE_URL)) {
+            return $path;
         }
 
-        return asset('storage/' . $this->image_path);
+        $disk = Storage::disk('public');
+
+        if ($disk->exists($path)) {
+            return asset('storage/' . $path);
+        }
+
+        $basename = basename($path);
+
+        foreach ([
+            'exercise-library/imports',
+            'exercise-library',
+        ] as $prefix) {
+            $candidate = trim($prefix . '/' . $basename, '/');
+
+            if ($disk->exists($candidate)) {
+                return asset('storage/' . $candidate);
+            }
+        }
+
+        $matchedPath = $this->findImportedAssetByBasename($basename);
+
+        if ($matchedPath) {
+            return asset('storage/' . $matchedPath);
+        }
+
+        return asset('storage/' . ltrim($path, '/'));
+    }
+
+    private function findImportedAssetByBasename(string $basename): ?string
+    {
+        static $basenameIndex = null;
+
+        if ($basenameIndex === null) {
+            $basenameIndex = [];
+
+            foreach (['exercise-library/imports', 'exercise-library'] as $directory) {
+                foreach (Storage::disk('public')->allFiles($directory) as $file) {
+                    $basenameIndex[basename($file)] ??= $file;
+                }
+            }
+        }
+
+        return $basenameIndex[$basename] ?? null;
     }
 }
