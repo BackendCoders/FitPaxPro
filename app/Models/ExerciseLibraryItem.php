@@ -54,7 +54,7 @@ class ExerciseLibraryItem extends Model
         $disk = Storage::disk('public');
 
         if ($disk->exists($path)) {
-            return asset('storage/' . $path);
+            return route('exercise-library.media', ['path' => $path]);
         }
 
         $basename = basename($path);
@@ -66,17 +66,17 @@ class ExerciseLibraryItem extends Model
             $candidate = trim($prefix . '/' . $basename, '/');
 
             if ($disk->exists($candidate)) {
-                return asset('storage/' . $candidate);
+                return route('exercise-library.media', ['path' => $candidate]);
             }
         }
 
         $matchedPath = $this->findImportedAssetByBasename($basename);
 
         if ($matchedPath) {
-            return asset('storage/' . $matchedPath);
+            return route('exercise-library.media', ['path' => $matchedPath]);
         }
 
-        return asset('storage/' . ltrim($path, '/'));
+        return route('exercise-library.media', ['path' => ltrim($path, '/')]);
     }
 
     private function findImportedAssetByBasename(string $basename): ?string

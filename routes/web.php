@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,6 +20,14 @@ use App\Http\Controllers\Auth\RegisterController;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/exercise-library/media/{path}', function (string $path) {
+    $path = ltrim(str_replace('\\', '/', $path), '/');
+
+    abort_unless(Storage::disk('public')->exists($path), 404);
+
+    return Storage::disk('public')->response($path);
+})->where('path', '.*')->name('exercise-library.media');
 
 // Auth Routes
 Route::middleware('guest')->group(function () {
