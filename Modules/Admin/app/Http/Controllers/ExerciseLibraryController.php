@@ -145,6 +145,12 @@ class ExerciseLibraryController extends Controller
             };
 
             $defaultCategory = $this->deriveCategoryFromPath($path);
+            $isReferenceDataFile = $this->isReferenceDataFile($path, $rows);
+
+            if ($isReferenceDataFile) {
+                $skipped += count($rows);
+                continue;
+            }
 
             foreach ($rows as $index => $row) {
                 try {
@@ -263,17 +269,20 @@ class ExerciseLibraryController extends Controller
         $instructions = $row['instructions'] ?? $row['steps'] ?? null;
         $tips = $row['tips'] ?? $row['notes'] ?? null;
         $primaryMuscles = $row['primaryMuscles'] ?? $row['primary_muscles'] ?? $row['target_muscle_group'] ?? null;
+        $secondaryMuscles = $row['secondaryMuscles'] ?? $row['secondary_muscles'] ?? null;
+        $bodyParts = $row['bodyParts'] ?? $row['body_parts'] ?? null;
+        $equipments = $row['equipments'] ?? $row['equipment'] ?? $row['equipment_type'] ?? null;
 
         return [
             'exercise_name' => $exerciseName,
-            'target_muscle_group' => $this->toDelimitedText($primaryMuscles),
-            'exercise_category' => $row['exercise_category'] ?? $row['category'] ?? $defaultCategory,
-            'equipment_type' => $this->toDelimitedText($row['equipment_type'] ?? $row['equipment'] ?? null),
+            'target_muscle_group' => $this->toDelimitedText($primaryMuscles ?: $bodyParts),
+            'exercise_category' => $row['exercise_category'] ?? $row['category'] ?? $this->toDelimitedText($bodyParts) ?? $defaultCategory,
+            'equipment_type' => $this->toDelimitedText($equipments),
             'difficulty_level' => $row['difficulty_level'] ?? $row['difficulty'] ?? null,
-            'image_path' => $row['image_path'] ?? $row['image'] ?? $row['image_url'] ?? null,
+            'image_path' => $row['image_path'] ?? $row['image'] ?? $row['image_url'] ?? $row['gifUrl'] ?? $row['gif_url'] ?? null,
             'instruction_video_url' => $row['instruction_video_url'] ?? $row['video_url'] ?? null,
             'instructions' => $this->toParagraphText($instructions),
-            'tips' => $this->toParagraphText($tips),
+            'tips' => $this->toParagraphText($tips) ?: $this->toDelimitedText($secondaryMuscles),
             'sets' => $this->toIntegerOrNull($row['sets'] ?? null),
             'reps' => $row['reps'] ?? null,
             'rest_period_seconds' => $this->toIntegerOrNull($row['rest_period_seconds'] ?? $row['rest'] ?? null),
@@ -335,7 +344,10 @@ class ExerciseLibraryController extends Controller
             $row['image_path'] ?? null,
             $row['image'] ?? null,
             $row['image_url'] ?? null,
+            $row['gifUrl'] ?? null,
+            $row['gif_url'] ?? null,
             $row['slug'] ?? null,
+            $row['exerciseId'] ?? null,
             $exerciseName,
             $defaultCategory,
         ];
@@ -362,6 +374,37 @@ class ExerciseLibraryController extends Controller
         }
 
         return null;
+    }
+
+    private function isReferenceDataFile(string $path, array $rows): bool
+    {
+        $basename = strtolower(pathinfo($path, PATHINFO_FILENAME));
+
+        if (in_array($basename, ['bodyparts', 'equipments', 'muscles'], true)) {
+            return true;
+        }
+
+        $firstRow = $rows[0] ?? null;
+        if (!is_array($firstRow)) {
+            return false;
+        }
+
+        $keys = array_map('strtolower', array_keys($firstRow));
+        $exerciseSignals = [
+            'exerciseid',
+            'gifurl',
+            'instructions',
+            'targetmuscles',
+            'bodyparts',
+            'equipments',
+            'secondarymuscles',
+        ];
+
+        if (!array_intersect($keys, $exerciseSignals)) {
+            return true;
+        }
+
+        return false;
     }
 
     private function toDelimitedText(mixed $value): ?string
