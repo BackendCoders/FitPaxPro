@@ -22,6 +22,7 @@ use Modules\Users\app\Http\Controllers\Api\UserAppProfileController;
 use Modules\Users\app\Http\Controllers\Api\UserProfileController;
 use Modules\Users\app\Http\Controllers\Api\GymListingController;
 use Modules\Users\app\Http\Controllers\Api\UserAppDiscoveryController;
+use Modules\Users\app\Http\Controllers\Api\ExerciseLibraryController;
 
 Route::prefix('user-app')->group(function () {
     // Discovery & Global Search Routes
@@ -34,6 +35,11 @@ Route::prefix('user-app')->group(function () {
     Route::get('/gyms', [GymListingController::class, 'index']);
     Route::get('/gyms/{identifier}', [GymListingController::class, 'show']);
     Route::get('/gyms/{identifier}/plans', [GymListingController::class, 'plans']);
+
+    // Exercise Library
+    Route::get('/exercises', [ExerciseLibraryController::class, 'index']);
+    Route::get('/exercises/filters', [ExerciseLibraryController::class, 'filters']);
+    Route::get('/exercises/{identifier}', [ExerciseLibraryController::class, 'show']);
 
     Route::post('/registration/step-1', [UserAppRegistrationController::class, 'step1']);
     Route::post('/registration/verify-otp', [UserAppRegistrationController::class, 'verifyOtp']);

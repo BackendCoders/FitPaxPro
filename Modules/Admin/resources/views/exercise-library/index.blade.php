@@ -449,6 +449,7 @@
                     <div class="panel-copy">
                         Select a folder and the admin will sort the files internally before import.
                         JSON and CSV files create exercise rows, while image files in the same folder are matched by name or slug.
+                        CSV files with `imageName`, `base64encoded`, `imageWidth`, `imageHeight`, `poseLandmarks`, and `excercise` are also supported.
                     </div>
 
                     <div id="importDropzone" class="dropzone is-empty mt-4">
@@ -458,7 +459,7 @@
                             </div>
                             <div>
                                 <div class="panel-title mb-1">Choose a folder or mixed asset set</div>
-                                <div class="panel-copy mb-0">Supports your exercise data folders from `D:\machine learning\fitpaxproai\data` and similar exports.</div>
+                                <div class="panel-copy mb-0">Supports your exercise data folders from `D:\machine learning\fitpaxproai\data`, inline base64 CSV exports, and similar datasets.</div>
                             </div>
                         </div>
 

@@ -15,11 +15,21 @@ class ExerciseLibraryItem extends Model
 
     protected $fillable = [
         'exercise_name',
+        'source_exercise_id',
+        'source_slug',
+        'source_image_name',
         'target_muscle_group',
+        'body_part',
+        'target_muscles_json',
+        'secondary_muscles_json',
+        'equipments_json',
         'exercise_category',
         'equipment_type',
         'difficulty_level',
         'image_path',
+        'image_width',
+        'image_height',
+        'pose_landmarks_json',
         'instruction_video_url',
         'instructions',
         'tips',
@@ -37,6 +47,10 @@ class ExerciseLibraryItem extends Model
         'estimated_duration_minutes' => 'integer',
         'order_index' => 'integer',
         'is_active' => 'boolean',
+        'target_muscles_json' => 'array',
+        'secondary_muscles_json' => 'array',
+        'equipments_json' => 'array',
+        'pose_landmarks_json' => 'array',
     ];
 
     public function getImageUrlAttribute(): ?string

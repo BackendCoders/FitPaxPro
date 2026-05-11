@@ -161,11 +161,27 @@ class ExerciseLibraryController extends Controller
                         continue;
                     }
 
+                    $inlineBase64 = $row['base64encoded'] ?? $row['base64_encoded'] ?? null;
+
+                    if (empty($payload['image_path']) && !empty($inlineBase64)) {
+                        $payload['image_path'] = $this->storeImportedBase64Image(
+                            (string) $inlineBase64,
+                            (string) ($payload['source_image_name'] ?? $row['imageName'] ?? $payload['exercise_name']),
+                            $batchToken,
+                            $index
+                        );
+                    }
+
                     if (empty($payload['image_path'])) {
                         $payload['image_path'] = $this->resolveImportedImage($row, $imageIndex, $payload['exercise_name'], $defaultCategory);
                     }
 
-                    $existing = ExerciseLibraryItem::where('exercise_name', $payload['exercise_name'])->first();
+                    $existing = ExerciseLibraryItem::query()
+                        ->when(!empty($payload['source_exercise_id']), fn ($query) => $query->where('source_exercise_id', $payload['source_exercise_id']))
+                        ->when(empty($payload['source_exercise_id']) && !empty($payload['source_image_name']), fn ($query) => $query->where('source_image_name', $payload['source_image_name']))
+                        ->when(empty($payload['source_exercise_id']) && empty($payload['source_image_name']) && !empty($payload['source_slug']), fn ($query) => $query->where('source_slug', $payload['source_slug']))
+                        ->when(empty($payload['source_exercise_id']) && empty($payload['source_image_name']) && empty($payload['source_slug']) && !empty($payload['exercise_name']), fn ($query) => $query->where('exercise_name', $payload['exercise_name']))
+                        ->first();
                     if ($existing) {
                         $existing->update($payload);
                     } else {
@@ -265,21 +281,38 @@ class ExerciseLibraryController extends Controller
 
     private function normalizeImportedRow(array $row, string $defaultCategory): array
     {
-        $exerciseName = $row['exercise_name'] ?? $row['name'] ?? $row['title'] ?? null;
+        $exerciseName = $row['exercise_name'] ?? $row['name'] ?? $row['title'] ?? $row['excercise'] ?? $row['exercise'] ?? null;
+        $sourceExerciseId = $row['exerciseId'] ?? $row['exercise_id'] ?? null;
+        $sourceSlug = $row['slug'] ?? $row['source_slug'] ?? ($exerciseName ? Str::slug((string) $exerciseName) : null);
+        $sourceImageName = $row['imageName'] ?? $row['image_name'] ?? null;
         $instructions = $row['instructions'] ?? $row['steps'] ?? null;
         $tips = $row['tips'] ?? $row['notes'] ?? null;
         $primaryMuscles = $row['primaryMuscles'] ?? $row['primary_muscles'] ?? $row['target_muscle_group'] ?? null;
         $secondaryMuscles = $row['secondaryMuscles'] ?? $row['secondary_muscles'] ?? null;
         $bodyParts = $row['bodyParts'] ?? $row['body_parts'] ?? null;
         $equipments = $row['equipments'] ?? $row['equipment'] ?? $row['equipment_type'] ?? null;
+        $poseLandmarks = $this->parsePoseLandmarks($row['poseLandmarks'] ?? $row['pose_landmarks'] ?? null);
+        $imageWidth = $this->toIntegerOrNull($row['imageWidth'] ?? $row['image_width'] ?? null);
+        $imageHeight = $this->toIntegerOrNull($row['imageHeight'] ?? $row['image_height'] ?? null);
+        $base64Encoded = $row['base64encoded'] ?? $row['base64_encoded'] ?? null;
 
         return [
             'exercise_name' => $exerciseName,
+            'source_exercise_id' => $sourceExerciseId,
+            'source_slug' => $sourceSlug,
+            'source_image_name' => $sourceImageName,
             'target_muscle_group' => $this->toDelimitedText($primaryMuscles ?: $bodyParts),
+            'body_part' => $this->toDelimitedText($bodyParts),
+            'target_muscles_json' => $this->toArrayOrNull($primaryMuscles),
+            'secondary_muscles_json' => $this->toArrayOrNull($secondaryMuscles),
+            'equipments_json' => $this->toArrayOrNull($equipments),
             'exercise_category' => $row['exercise_category'] ?? $row['category'] ?? $this->toDelimitedText($bodyParts) ?? $defaultCategory,
             'equipment_type' => $this->toDelimitedText($equipments),
             'difficulty_level' => $row['difficulty_level'] ?? $row['difficulty'] ?? null,
             'image_path' => $row['image_path'] ?? $row['image'] ?? $row['image_url'] ?? null,
+            'image_width' => $imageWidth,
+            'image_height' => $imageHeight,
+            'pose_landmarks_json' => $poseLandmarks,
             'instruction_video_url' => $row['instruction_video_url'] ?? $row['video_url'] ?? null,
             'instructions' => $this->toParagraphText($instructions),
             'tips' => $this->toParagraphText($tips) ?: $this->toDelimitedText($secondaryMuscles),
@@ -317,6 +350,35 @@ class ExerciseLibraryController extends Controller
         $basename = basename($relativePath);
 
         return $file->storeAs($directory, $basename, 'public');
+    }
+
+    private function storeImportedBase64Image(string $encoded, string $sourceName, string $batchToken, int $position): ?string
+    {
+        $normalized = $this->normalizeBase64EncodedImage($encoded);
+
+        if ($normalized === null) {
+            return null;
+        }
+
+        $binary = base64_decode($normalized, true);
+        if ($binary === false) {
+            return null;
+        }
+
+        $extension = strtolower(pathinfo($sourceName, PATHINFO_EXTENSION));
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp', 'svg'];
+        if (!in_array($extension, $allowedExtensions, true)) {
+            $extension = 'jpg';
+        }
+
+        $baseName = pathinfo($sourceName, PATHINFO_FILENAME) ?: 'exercise-image';
+        $safeBaseName = Str::slug($baseName) ?: 'exercise-image';
+        $fileName = sprintf('%04d-%s.%s', $position + 1, $safeBaseName, $extension);
+        $relativePath = "exercise-library/imports/{$batchToken}/inline-images/{$fileName}";
+
+        Storage::disk('public')->put($relativePath, $binary);
+
+        return $relativePath;
     }
 
     private function registerImageIndex(array &$index, string $sourcePath, string $storedPath): void
@@ -391,12 +453,22 @@ class ExerciseLibraryController extends Controller
         $keys = array_map('strtolower', array_keys($firstRow));
         $exerciseSignals = [
             'exerciseid',
+            'imagename',
+            'image_name',
+            'base64encoded',
+            'base64_encoded',
             'gifurl',
             'instructions',
             'targetmuscles',
             'bodyparts',
             'equipments',
             'secondarymuscles',
+            'imagewidth',
+            'imageheight',
+            'poselandmarks',
+            'pose_landmarks',
+            'excercise',
+            'exercise',
         ];
 
         if (!array_intersect($keys, $exerciseSignals)) {
@@ -458,5 +530,67 @@ class ExerciseLibraryController extends Controller
         $normalized = strtolower(trim((string) $value));
 
         return in_array($normalized, ['1', 'true', 'yes', 'active', 'on'], true);
+    }
+
+    private function toArrayOrNull(mixed $value): ?array
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (is_array($value)) {
+            return array_values(array_filter(array_map(static fn ($item) => is_string($item) ? trim($item) : (string) $item, $value), static fn ($item) => $item !== ''));
+        }
+
+        return [is_string($value) ? trim($value) : (string) $value];
+    }
+
+    private function normalizeBase64EncodedImage(string $value): ?string
+    {
+        $normalized = trim($value);
+
+        if ($normalized === '') {
+            return null;
+        }
+
+        if (preg_match('/^data:image\/[a-z0-9.+-]+;base64,(.*)$/is', $normalized, $matches)) {
+            $normalized = $matches[1];
+        }
+
+        if (preg_match('/^b([\'"])(.*)\1$/s', $normalized, $matches)) {
+            $normalized = $matches[2];
+        }
+
+        $normalized = trim($normalized, "\"'");
+        $normalized = preg_replace('/\s+/', '', $normalized) ?? $normalized;
+
+        return $normalized !== '' ? $normalized : null;
+    }
+
+    private function parsePoseLandmarks(mixed $value): ?array
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (is_array($value)) {
+            return array_values(array_filter(array_map(static fn ($item) => is_string($item) ? trim($item) : (string) $item, $value), static fn ($item) => $item !== ''));
+        }
+
+        $text = trim((string) $value);
+        if ($text === '') {
+            return null;
+        }
+
+        $decoded = json_decode($text, true);
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+            return array_values(array_filter(array_map(static fn ($item) => is_string($item) ? trim($item) : (string) $item, $decoded), static fn ($item) => $item !== ''));
+        }
+
+        if (preg_match_all('/\'([^\']*)\'/', $text, $matches) && !empty($matches[1])) {
+            return array_values(array_filter(array_map('trim', $matches[1]), static fn ($item) => $item !== ''));
+        }
+
+        return [$text];
     }
 }
