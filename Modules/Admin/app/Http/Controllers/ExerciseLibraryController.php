@@ -279,7 +279,7 @@ class ExerciseLibraryController extends Controller
             'exercise_category' => $row['exercise_category'] ?? $row['category'] ?? $this->toDelimitedText($bodyParts) ?? $defaultCategory,
             'equipment_type' => $this->toDelimitedText($equipments),
             'difficulty_level' => $row['difficulty_level'] ?? $row['difficulty'] ?? null,
-            'image_path' => $row['image_path'] ?? $row['image'] ?? $row['image_url'] ?? $row['gifUrl'] ?? $row['gif_url'] ?? null,
+            'image_path' => $row['image_path'] ?? $row['image'] ?? $row['image_url'] ?? null,
             'instruction_video_url' => $row['instruction_video_url'] ?? $row['video_url'] ?? null,
             'instructions' => $this->toParagraphText($instructions),
             'tips' => $this->toParagraphText($tips) ?: $this->toDelimitedText($secondaryMuscles),
