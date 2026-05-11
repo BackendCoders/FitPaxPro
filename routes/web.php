@@ -29,6 +29,14 @@ Route::get('/exercise-library/media/{path}', function (string $path) {
     return Storage::disk('public')->response($path);
 })->where('path', '.*')->name('exercise-library.media');
 
+Route::get('/profile-image/media/{path}', function (string $path) {
+    $path = ltrim(str_replace('\\', '/', $path), '/');
+
+    abort_unless(Storage::disk('public')->exists($path), 404);
+
+    return Storage::disk('public')->response($path);
+})->where('path', '.*')->name('profile-image.media');
+
 // Auth Routes
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');

@@ -63,7 +63,20 @@ class UserAppProfileController extends Controller
      *     summary="Get User Profile (Me)",
      *     description="Fetches the logged-in user's first name and profile picture URL for the top-left avatar.",
      *     security={{"sanctum": {}}},
-     *     @OA\Response(response=200, description="User's basic info")
+     *     @OA\Response(
+     *         response=200,
+     *         description="User's basic info",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="first_name", type="string", example="John"),
+     *                 @OA\Property(property="profile_image", type="string", example="avatars/user-1.jpg"),
+     *                 @OA\Property(property="profile_image_url", type="string", example="https://example.com/profile-image/media/avatars/user-1.jpg")
+     *             )
+     *         )
+     *     )
      * )
      */
     public function me(Request $request): JsonResponse
@@ -75,7 +88,8 @@ class UserAppProfileController extends Controller
             'success' => true,
             'data' => [
                 'first_name' => $firstName,
-                'profile_image' => $user->profile_image
+                'profile_image' => $user->profile_image,
+                'profile_image_url' => $user->profile_image_url,
             ]
         ]);
     }

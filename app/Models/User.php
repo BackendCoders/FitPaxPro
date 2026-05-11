@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -18,7 +19,7 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, HasRoles, HasUuid, Notifiable, SoftDeletes, HasCustomFields;
 
-    protected $appends = ['custom_fields_data'];
+    protected $appends = ['custom_fields_data', 'profile_image_url'];
 
     /**
      * The attributes that are mass assignable.
@@ -139,6 +140,29 @@ class User extends Authenticatable
     public function fcmTokens(): HasMany
     {
         return $this->hasMany(FcmToken::class);
+    }
+
+    public function getProfileImageUrlAttribute(): ?string
+    {
+        if (!$this->profile_image) {
+            return null;
+        }
+
+        $path = str_replace('\\', '/', trim((string) $this->profile_image));
+
+        if (filter_var($path, FILTER_VALIDATE_URL)) {
+            return $path;
+        }
+
+        if (str_starts_with($path, 'storage/')) {
+            $path = ltrim(substr($path, strlen('storage/')), '/');
+        }
+
+        if (Storage::disk('public')->exists($path)) {
+            return route('profile-image.media', ['path' => $path]);
+        }
+
+        return route('profile-image.media', ['path' => $path]);
     }
 
     public function notificationLogs(): HasMany

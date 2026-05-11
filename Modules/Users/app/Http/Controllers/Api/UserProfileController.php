@@ -48,18 +48,22 @@ class UserProfileController extends Controller
      *     summary="Update the profile of the authenticated user",
      *     description="Updates user basic information and health/fitness profile fields.",
      *     security={{"sanctum": {}}},
-     *     @OA\RequestBody(required=true, @OA\JsonContent(
-     *         @OA\Property(property="name", type="string", example="John Doe"),
-     *         @OA\Property(property="phone", type="string", example="+919876543210"),
-     *         @OA\Property(property="gender", type="string", enum={"male", "female", "other", "prefer_not_to_say"}),
-     *         @OA\Property(property="age", type="integer", example=25),
-     *         @OA\Property(property="date_of_birth", type="string", format="date", example="1999-01-01"),
-     *         @OA\Property(property="current_weight", type="number", example=75.5),
-     *         @OA\Property(property="target_weight", type="number", example=70.0),
-     *         @OA\Property(property="height", type="number", example=180.0),
-     *         @OA\Property(property="goal_type", type="string", enum={"weight_gain", "weight_loss", "maintenance", "muscle_building"}),
-     *         @OA\Property(property="diet_type", type="string", enum={"veg", "non_veg", "eggitarian", "vegan", "keto", "paleo"}),
-     *         @OA\Property(property="is_public", type="boolean", example=true)
+     *     @OA\RequestBody(required=true, @OA\MediaType(
+     *         mediaType="multipart/form-data",
+     *         @OA\Schema(
+     *             @OA\Property(property="name", type="string", example="John Doe"),
+     *             @OA\Property(property="phone", type="string", example="+919876543210"),
+     *             @OA\Property(property="profile_image", type="string", format="binary", description="Profile image upload"),
+     *             @OA\Property(property="gender", type="string", enum={"male", "female", "other", "prefer_not_to_say"}),
+     *             @OA\Property(property="age", type="integer", example=25),
+     *             @OA\Property(property="date_of_birth", type="string", format="date", example="1999-01-01"),
+     *             @OA\Property(property="current_weight", type="number", example=75.5),
+     *             @OA\Property(property="target_weight", type="number", example=70.0),
+     *             @OA\Property(property="height", type="number", example=180.0),
+     *             @OA\Property(property="goal_type", type="string", enum={"weight_gain", "weight_loss", "maintenance", "muscle_building"}),
+     *             @OA\Property(property="diet_type", type="string", enum={"veg", "non_veg", "eggitarian", "vegan", "keto", "paleo"}),
+     *             @OA\Property(property="is_public", type="boolean", example=true)
+     *         )
      *     )),
      *     @OA\Response(
      *         response=200, 
