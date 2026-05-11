@@ -55,6 +55,19 @@
         }
         .btn-stealth:hover { background: #fff; color: #000; }
         .btn-delete:hover { background: #E11218; color: #fff; border-color: #E11218; }
+
+        .import-card {
+            background: #121418; border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 22px; padding: 24px; margin-bottom: 22px;
+        }
+        .upload-input {
+            background: #08090b !important; border: 1px solid rgba(255,255,255,0.06) !important;
+            color: #fff !important; border-radius: 14px !important; font-size: 0.9rem;
+            padding: 12px 16px !important;
+        }
+        .import-status {
+            color: rgba(255,255,255,0.55); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px;
+        }
     </style>
 
     <div class="exercise-wrapper container-fluid">
@@ -69,6 +82,27 @@
                 <a href="{{ route('admin.exercise-library.create') }}" class="launch-btn">
                     <iconify-icon icon="tabler:plus" class="fs-18"></iconify-icon> NEW EXERCISE
                 </a>
+            </div>
+        </div>
+
+        <div class="import-card mb-4">
+            <div class="row g-3 align-items-end">
+                <div class="col-lg-5">
+                    <label class="field-label mb-2">Bulk Import JSON / CSV</label>
+                    <input type="file" id="exerciseImportFile" class="form-control upload-input" accept=".json,.csv,application/json,text/csv">
+                    <div class="mt-2 import-status">Supports arrays like the sample files in `D:\machine learning\fitpaxproai\data`.</div>
+                </div>
+                <div class="col-lg-3">
+                    <button type="button" id="exerciseImportBtn" class="launch-btn w-100 justify-content-center">
+                        <iconify-icon icon="tabler:cloud-upload" class="fs-18"></iconify-icon> IMPORT FILE
+                    </button>
+                </div>
+                <div class="col-lg-4">
+                    <div class="progress" style="height: 12px; background: rgba(255,255,255,0.06);">
+                        <div id="exerciseImportProgress" class="progress-bar" role="progressbar" style="width: 0%; background: linear-gradient(90deg, #E11218, #ff5b61);">0%</div>
+                    </div>
+                    <div id="exerciseImportText" class="mt-2 import-status">Waiting for file selection.</div>
+                </div>
             </div>
         </div>
 
@@ -141,4 +175,77 @@
             @endforelse
         </div>
     </div>
+
+    @push('scripts')
+    <script>
+        (function () {
+            const fileInput = document.getElementById('exerciseImportFile');
+            const button = document.getElementById('exerciseImportBtn');
+            const progress = document.getElementById('exerciseImportProgress');
+            const text = document.getElementById('exerciseImportText');
+
+            if (!fileInput || !button || !progress || !text) {
+                return;
+            }
+
+            function setProgress(value, label) {
+                const pct = Math.max(0, Math.min(100, value));
+                progress.style.width = pct + '%';
+                progress.textContent = pct + '%';
+                text.textContent = label || (pct + '% uploaded');
+            }
+
+            button.addEventListener('click', function () {
+                const file = fileInput.files && fileInput.files[0];
+                if (!file) {
+                    text.textContent = 'Select a JSON or CSV file first.';
+                    return;
+                }
+
+                button.disabled = true;
+                fileInput.disabled = true;
+                const formData = new FormData();
+                formData.append('import_file', file);
+                formData.append('_token', '{{ csrf_token() }}');
+
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', '{{ route('admin.exercise-library.import') }}', true);
+                xhr.responseType = 'json';
+
+                xhr.upload.onprogress = function (event) {
+                    if (event.lengthComputable) {
+                        setProgress(Math.round((event.loaded / event.total) * 100), 'Uploading ' + file.name + '...');
+                    }
+                };
+
+                xhr.onload = function () {
+                    const payload = xhr.response || {};
+                    if (xhr.status >= 200 && xhr.status < 300 && payload.success) {
+                        setProgress(100, `Imported ${payload.created || 0} exercises. ${payload.skipped || 0} skipped.`);
+                        if (payload.errors && payload.errors.length) {
+                            text.textContent += ' Some rows had issues; check the console.';
+                            console.warn('Exercise import warnings:', payload.errors);
+                        }
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 700);
+                    } else {
+                        setProgress(0, payload.message || 'Import failed.');
+                        button.disabled = false;
+                        fileInput.disabled = false;
+                    }
+                };
+
+                xhr.onerror = function () {
+                    setProgress(0, 'Upload failed. Please try again.');
+                    button.disabled = false;
+                    fileInput.disabled = false;
+                };
+
+                setProgress(0, 'Uploading ' + file.name + '...');
+                xhr.send(formData);
+            });
+        })();
+    </script>
+    @endpush
 </x-app-layout>

@@ -32,6 +32,7 @@ Route::prefix('admin')->middleware(['auth'])->group(function() {
     Route::resource('categories', Modules\Admin\app\Http\Controllers\CategoryController::class)->names('admin.categories');
 
     // Exercise Library Management
+    Route::post('exercise-library/import', [Modules\Admin\app\Http\Controllers\ExerciseLibraryController::class, 'import'])->name('admin.exercise-library.import');
     Route::post('exercise-library/{exercise_library}/toggle-status', [Modules\Admin\app\Http\Controllers\ExerciseLibraryController::class, 'toggleStatus'])->name('admin.exercise-library.toggle-status');
     Route::resource('exercise-library', Modules\Admin\app\Http\Controllers\ExerciseLibraryController::class)->except(['show'])->names('admin.exercise-library');
 });
