@@ -17,6 +17,7 @@ class ExerciseLibraryItem extends Model
         'exercise_name',
         'source_exercise_id',
         'source_slug',
+        'source_match_key',
         'source_image_name',
         'target_muscle_group',
         'body_part',

@@ -184,13 +184,14 @@ class ExerciseLibraryController extends Controller
                     }
 
                     $existing = ExerciseLibraryItem::query()
-                        ->when(!empty($payload['source_exercise_id']), fn ($query) => $query->where('source_exercise_id', $payload['source_exercise_id']))
-                        ->when(empty($payload['source_exercise_id']) && !empty($payload['source_image_name']), fn ($query) => $query->where('source_image_name', $payload['source_image_name']))
-                        ->when(empty($payload['source_exercise_id']) && empty($payload['source_image_name']) && !empty($payload['source_slug']), fn ($query) => $query->where('source_slug', $payload['source_slug']))
-                        ->when(empty($payload['source_exercise_id']) && empty($payload['source_image_name']) && empty($payload['source_slug']) && !empty($payload['exercise_name']), fn ($query) => $query->where('exercise_name', $payload['exercise_name']))
+                        ->when(!empty($payload['source_match_key']), fn ($query) => $query->where('source_match_key', $payload['source_match_key']))
+                        ->when(empty($payload['source_match_key']) && !empty($payload['source_exercise_id']), fn ($query) => $query->where('source_exercise_id', $payload['source_exercise_id']))
+                        ->when(empty($payload['source_match_key']) && empty($payload['source_exercise_id']) && !empty($payload['source_image_name']), fn ($query) => $query->where('source_image_name', $payload['source_image_name']))
+                        ->when(empty($payload['source_match_key']) && empty($payload['source_exercise_id']) && empty($payload['source_image_name']) && !empty($payload['source_slug']), fn ($query) => $query->where('source_slug', $payload['source_slug']))
+                        ->when(empty($payload['source_match_key']) && empty($payload['source_exercise_id']) && empty($payload['source_image_name']) && empty($payload['source_slug']) && !empty($payload['exercise_name']), fn ($query) => $query->where('exercise_name', $payload['exercise_name']))
                         ->first();
                     if ($existing) {
-                        $existing->update($payload);
+                        $this->fillImportedPayload($existing, $payload);
                     } else {
                         ExerciseLibraryItem::create($payload);
                     }
@@ -292,6 +293,14 @@ class ExerciseLibraryController extends Controller
         $sourceExerciseId = $row['exerciseId'] ?? $row['exercise_id'] ?? $row['pk'] ?? null;
         $sourceSlug = $row['slug'] ?? $row['source_slug'] ?? ($exerciseName ? Str::slug((string) $exerciseName) : null);
         $sourceImageName = $row['imageName'] ?? $row['image_name'] ?? null;
+        $sourceMatchKey = $this->normalizeImportKey(
+            $row['source_match_key']
+                ?? $sourceSlug
+                ?? $row['excercise']
+                ?? $row['exercise']
+                ?? $row['name']
+                ?? $sourceImageName
+        );
         $instructions = $row['instructions'] ?? $row['steps'] ?? null;
         $tips = $row['tips'] ?? $row['notes'] ?? null;
         $primaryMuscles = $row['primaryMuscles'] ?? $row['primary_muscles'] ?? $row['target_muscle_group'] ?? null;
@@ -307,6 +316,7 @@ class ExerciseLibraryController extends Controller
             'exercise_name' => $exerciseName,
             'source_exercise_id' => $sourceExerciseId,
             'source_slug' => $sourceSlug,
+            'source_match_key' => $sourceMatchKey,
             'source_image_name' => $sourceImageName,
             'target_muscle_group' => $this->toDelimitedText($primaryMuscles ?: $bodyParts),
             'body_part' => $this->toDelimitedText($bodyParts),
@@ -393,9 +403,8 @@ class ExerciseLibraryController extends Controller
         $normalized = $this->normalizeImportPath($sourcePath);
         $basename = pathinfo($normalized, PATHINFO_FILENAME);
         $keys = [
-            Str::slug($normalized),
-            Str::slug($basename),
-            preg_replace('/[^a-z0-9]+/i', '', strtolower($basename)),
+            $this->normalizeImportKey($normalized),
+            $this->normalizeImportKey($basename),
             strtolower($normalized),
             strtolower($basename),
         ];
@@ -435,9 +444,8 @@ class ExerciseLibraryController extends Controller
             $normalized = $this->normalizeImportPath((string) $reference);
             $basename = pathinfo($normalized, PATHINFO_FILENAME);
             $keys = [
-                Str::slug($normalized),
-                Str::slug($basename),
-                preg_replace('/[^a-z0-9]+/i', '', strtolower($basename)),
+                $this->normalizeImportKey($normalized),
+                $this->normalizeImportKey($basename),
                 strtolower($normalized),
                 strtolower($basename),
             ];
@@ -558,6 +566,31 @@ class ExerciseLibraryController extends Controller
         }
 
         return [is_string($value) ? trim($value) : (string) $value];
+    }
+
+    private function normalizeImportKey(mixed $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        $normalized = strtolower(trim((string) $value));
+        $normalized = preg_replace('/[^a-z0-9]+/i', '', $normalized) ?? '';
+
+        return $normalized !== '' ? $normalized : null;
+    }
+
+    private function fillImportedPayload(ExerciseLibraryItem $exercise, array $payload): void
+    {
+        foreach ($payload as $key => $value) {
+            if ($value === null || $value === '') {
+                continue;
+            }
+
+            $exercise->{$key} = $value;
+        }
+
+        $exercise->save();
     }
 
     private function normalizeBase64EncodedImage(string $value): ?string
