@@ -159,6 +159,35 @@ class ExerciseLibraryController extends Controller
                 continue;
             }
 
+            if ($extension === 'csv' && $this->isImageMappingFile($path, $rows)) {
+                foreach ($rows as $index => $row) {
+                    try {
+                        $storedPath = $this->storeImportedBase64Image(
+                            (string) ($row['base64encoded'] ?? $row['base64_encoded'] ?? ''),
+                            (string) ($row['imageName'] ?? $row['image_name'] ?? $row['excercise'] ?? $row['exercise'] ?? 'exercise-image'),
+                            $batchToken,
+                            $index
+                        );
+
+                        if (!$storedPath) {
+                            $skipped++;
+                            continue;
+                        }
+
+                        $this->registerImageIndex($imageIndex, $row['excercise'] ?? $row['exercise'] ?? $row['imageName'] ?? $row['image_name'] ?? $storedPath, $storedPath);
+
+                        if (!empty($row['imageName'])) {
+                            $this->registerImageIndex($imageIndex, $row['imageName'], $storedPath);
+                        }
+                    } catch (\Throwable $e) {
+                        $skipped++;
+                        $errors[] = $path . ' :: Row ' . ($index + 1) . ': ' . $e->getMessage();
+                    }
+                }
+
+                continue;
+            }
+
             foreach ($rows as $index => $row) {
                 try {
                     $payload = $this->normalizeImportedRow($row, $defaultCategory);
@@ -168,19 +197,12 @@ class ExerciseLibraryController extends Controller
                         continue;
                     }
 
-                    $inlineBase64 = $row['base64encoded'] ?? $row['base64_encoded'] ?? null;
-
-                    if (empty($payload['image_path']) && !empty($inlineBase64)) {
-                        $payload['image_path'] = $this->storeImportedBase64Image(
-                            (string) $inlineBase64,
-                            (string) ($payload['source_image_name'] ?? $row['imageName'] ?? $payload['exercise_name']),
-                            $batchToken,
-                            $index
-                        );
-                    }
-
                     if (empty($payload['image_path'])) {
-                        $payload['image_path'] = $this->resolveImportedImage($row, $imageIndex, $payload['exercise_name'], $defaultCategory);
+                        $matchedImages = $this->resolveImportedImages($row, $imageIndex, $payload['exercise_name'], $defaultCategory);
+                        $payload['image_paths_json'] = $matchedImages ?: null;
+                        $payload['image_path'] = $matchedImages[0] ?? null;
+                    } else {
+                        $payload['image_paths_json'] = $payload['image_path'] ? [$payload['image_path']] : null;
                     }
 
                     $existing = ExerciseLibraryItem::query()
@@ -411,30 +433,16 @@ class ExerciseLibraryController extends Controller
 
         foreach ($keys as $key) {
             if ($key) {
-                $index[$key] = $storedPath;
+                $index[$key] ??= [];
+                $index[$key] = array_values(array_unique(array_merge($index[$key], [$storedPath])));
             }
         }
     }
 
-    private function resolveImportedImage(array $row, array $imageIndex, string $exerciseName, string $defaultCategory): ?string
+    private function resolveImportedImages(array $row, array $imageIndex, string $exerciseName, string $defaultCategory): array
     {
-        $references = [
-            $row['image_path'] ?? null,
-            $row['image'] ?? null,
-            $row['image_url'] ?? null,
-            $row['gifUrl'] ?? null,
-            $row['gif_url'] ?? null,
-            $row['imageName'] ?? null,
-            $row['image_name'] ?? null,
-            $row['slug'] ?? null,
-            $row['source_slug'] ?? null,
-            $row['pk'] ?? null,
-            $row['exerciseId'] ?? null,
-            $row['exercise_id'] ?? null,
-            $row['name'] ?? null,
-            $exerciseName,
-            $defaultCategory,
-        ];
+        $references = $this->buildImageReferences($row, $exerciseName, $defaultCategory);
+        $matchedPaths = [];
 
         foreach ($references as $reference) {
             if (!$reference) {
@@ -452,12 +460,60 @@ class ExerciseLibraryController extends Controller
 
             foreach ($keys as $key) {
                 if ($key && isset($imageIndex[$key])) {
-                    return $imageIndex[$key];
+                    $matchedPaths = array_merge($matchedPaths, $imageIndex[$key]);
                 }
             }
         }
 
-        return null;
+        if (empty($matchedPaths)) {
+            $keywords = $this->extractKeywordsForMatch($row, $exerciseName, $defaultCategory);
+
+            foreach ($keywords as $keyword) {
+                $normalizedKeyword = $this->normalizeImportKey($keyword);
+
+                foreach ($imageIndex as $key => $paths) {
+                    if (!is_array($paths) || $key === '') {
+                        continue;
+                    }
+
+                    $normalizedKey = $this->normalizeImportKey($key);
+
+                    if (
+                        ($normalizedKeyword && $normalizedKey === $normalizedKeyword) ||
+                        ($normalizedKeyword && str_contains($normalizedKey ?? '', $normalizedKeyword)) ||
+                        ($normalizedKeyword && str_contains($normalizedKeyword, $normalizedKey ?? ''))
+                    ) {
+                        $matchedPaths = array_merge($matchedPaths, $paths);
+                    }
+                }
+            }
+        }
+
+        $matchedPaths = array_values(array_unique(array_filter($matchedPaths)));
+        sort($matchedPaths);
+
+        return $matchedPaths;
+    }
+
+    private function buildImageReferences(array $row, string $exerciseName, string $defaultCategory): array
+    {
+        return array_values(array_filter([
+            $row['image_path'] ?? null,
+            $row['image'] ?? null,
+            $row['image_url'] ?? null,
+            $row['gifUrl'] ?? null,
+            $row['gif_url'] ?? null,
+            $row['imageName'] ?? null,
+            $row['image_name'] ?? null,
+            $row['slug'] ?? null,
+            $row['source_slug'] ?? null,
+            $row['pk'] ?? null,
+            $row['exerciseId'] ?? null,
+            $row['exercise_id'] ?? null,
+            $row['name'] ?? null,
+            $exerciseName,
+            $defaultCategory,
+        ]));
     }
 
     private function isReferenceDataFile(string $path, array $rows): bool
@@ -499,6 +555,28 @@ class ExerciseLibraryController extends Controller
         }
 
         return false;
+    }
+
+    private function isImageMappingFile(string $path, array $rows): bool
+    {
+        $firstRow = $rows[0] ?? null;
+
+        if (!is_array($firstRow)) {
+            return false;
+        }
+
+        $keys = array_map('strtolower', array_keys($firstRow));
+
+        return (bool) array_intersect($keys, [
+            'imagename',
+            'image_name',
+            'base64encoded',
+            'base64_encoded',
+            'poselandmarks',
+            'pose_landmarks',
+            'excercise',
+            'exercise',
+        ]);
     }
 
     private function toDelimitedText(mixed $value): ?string
@@ -640,5 +718,79 @@ class ExerciseLibraryController extends Controller
         }
 
         return [$text];
+    }
+
+    private function extractKeywordsForMatch(array $row, string $exerciseName = '', string $defaultCategory = ''): array
+    {
+        $values = [
+            $exerciseName,
+            $defaultCategory,
+            $row['source_match_key'] ?? null,
+            $row['source_slug'] ?? null,
+            $row['source_exercise_id'] ?? null,
+            $row['exercise_name'] ?? null,
+            $row['name'] ?? null,
+            $row['title'] ?? null,
+            $row['excercise'] ?? null,
+            $row['exercise'] ?? null,
+            $row['slug'] ?? null,
+            $row['pk'] ?? null,
+            $row['exerciseId'] ?? null,
+            $row['exercise_id'] ?? null,
+            $row['imageName'] ?? null,
+            $row['image_name'] ?? null,
+            $row['primaryMuscles'] ?? null,
+            $row['primary_muscles'] ?? null,
+            $row['secondaryMuscles'] ?? null,
+            $row['secondary_muscles'] ?? null,
+            $row['bodyParts'] ?? null,
+            $row['body_parts'] ?? null,
+            $row['equipments'] ?? null,
+            $row['equipment'] ?? null,
+            $row['equipment_type'] ?? null,
+            $row['steps'] ?? null,
+            $row['instructions'] ?? null,
+            $row['notes'] ?? null,
+            $row['tips'] ?? null,
+        ];
+
+        $keywords = [];
+
+        foreach ($values as $value) {
+            if ($value === null || $value === '') {
+                continue;
+            }
+
+            if (is_array($value)) {
+                foreach ($value as $item) {
+                    if ($item === null || $item === '') {
+                        continue;
+                    }
+
+                    $rawItem = (string) $item;
+                    $keywords[] = $rawItem;
+                    $keywords[] = $this->normalizeImportKey($rawItem);
+
+                    foreach (preg_split('/[^a-z0-9]+/i', strtolower($rawItem), -1, PREG_SPLIT_NO_EMPTY) ?: [] as $token) {
+                        if (strlen($token) >= 3) {
+                            $keywords[] = $token;
+                        }
+                    }
+                }
+                continue;
+            }
+
+            $raw = (string) $value;
+            $keywords[] = $raw;
+            $keywords[] = $this->normalizeImportKey($raw);
+
+            foreach (preg_split('/[^a-z0-9]+/i', strtolower($raw), -1, PREG_SPLIT_NO_EMPTY) ?: [] as $token) {
+                if (strlen($token) >= 3) {
+                    $keywords[] = $token;
+                }
+            }
+        }
+
+        return array_values(array_unique(array_filter($keywords)));
     }
 }

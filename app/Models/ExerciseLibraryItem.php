@@ -28,6 +28,7 @@ class ExerciseLibraryItem extends Model
         'equipment_type',
         'difficulty_level',
         'image_path',
+        'image_paths_json',
         'image_width',
         'image_height',
         'pose_landmarks_json',
@@ -51,7 +52,13 @@ class ExerciseLibraryItem extends Model
         'target_muscles_json' => 'array',
         'secondary_muscles_json' => 'array',
         'equipments_json' => 'array',
+        'image_paths_json' => 'array',
         'pose_landmarks_json' => 'array',
+    ];
+
+    protected $appends = [
+        'image_url',
+        'image_urls',
     ];
 
     public function getImageUrlAttribute(): ?string
@@ -108,6 +115,38 @@ class ExerciseLibraryItem extends Model
 
         if ($matchedPath) {
             return route('exercise-library.media', ['path' => $matchedPath]);
+        }
+
+        return route('exercise-library.media', ['path' => ltrim($path, '/')]);
+    }
+
+    public function getImageUrlsAttribute(): array
+    {
+        $paths = $this->image_paths_json ?? [];
+
+        if (!is_array($paths)) {
+            $paths = [];
+        }
+
+        if ($this->image_path) {
+            array_unshift($paths, $this->image_path);
+        }
+
+        $paths = array_values(array_unique(array_filter($paths)));
+
+        return array_values(array_filter(array_map(fn ($path) => $this->resolveMediaUrl($path), $paths)));
+    }
+
+    private function resolveMediaUrl(string $path): ?string
+    {
+        $path = str_replace('\\', '/', trim($path));
+
+        if ($path === '') {
+            return null;
+        }
+
+        if (filter_var($path, FILTER_VALIDATE_URL)) {
+            return $path;
         }
 
         return route('exercise-library.media', ['path' => ltrim($path, '/')]);
