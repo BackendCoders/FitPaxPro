@@ -282,7 +282,7 @@ class ExerciseLibraryController extends Controller
     private function normalizeImportedRow(array $row, string $defaultCategory): array
     {
         $exerciseName = $row['exercise_name'] ?? $row['name'] ?? $row['title'] ?? $row['excercise'] ?? $row['exercise'] ?? null;
-        $sourceExerciseId = $row['exerciseId'] ?? $row['exercise_id'] ?? null;
+        $sourceExerciseId = $row['exerciseId'] ?? $row['exercise_id'] ?? $row['pk'] ?? null;
         $sourceSlug = $row['slug'] ?? $row['source_slug'] ?? ($exerciseName ? Str::slug((string) $exerciseName) : null);
         $sourceImageName = $row['imageName'] ?? $row['image_name'] ?? null;
         $instructions = $row['instructions'] ?? $row['steps'] ?? null;
@@ -388,6 +388,7 @@ class ExerciseLibraryController extends Controller
         $keys = [
             Str::slug($normalized),
             Str::slug($basename),
+            preg_replace('/[^a-z0-9]+/i', '', strtolower($basename)),
             strtolower($normalized),
             strtolower($basename),
         ];
@@ -407,8 +408,14 @@ class ExerciseLibraryController extends Controller
             $row['image_url'] ?? null,
             $row['gifUrl'] ?? null,
             $row['gif_url'] ?? null,
+            $row['imageName'] ?? null,
+            $row['image_name'] ?? null,
             $row['slug'] ?? null,
+            $row['source_slug'] ?? null,
+            $row['pk'] ?? null,
             $row['exerciseId'] ?? null,
+            $row['exercise_id'] ?? null,
+            $row['name'] ?? null,
             $exerciseName,
             $defaultCategory,
         ];
@@ -423,6 +430,7 @@ class ExerciseLibraryController extends Controller
             $keys = [
                 Str::slug($normalized),
                 Str::slug($basename),
+                preg_replace('/[^a-z0-9]+/i', '', strtolower($basename)),
                 strtolower($normalized),
                 strtolower($basename),
             ];
