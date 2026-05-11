@@ -2303,6 +2303,392 @@
                 }
             }
         },
+        "/user-app/exercises": {
+            "get": {
+                "tags": [
+                    "User App: Exercise Library"
+                ],
+                "summary": "List exercises with filters",
+                "description": "Returns the exercise library for the mobile app with search, filter, sort, and pagination support.",
+                "operationId": "2f26b9285e0890e61837939a2df00b52",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search by exercise name, category, muscle group, or equipment",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "category",
+                        "in": "query",
+                        "description": "Filter by exercise category",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "muscle_group",
+                        "in": "query",
+                        "description": "Filter by target muscle group",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "body_part",
+                        "in": "query",
+                        "description": "Filter by body part",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "equipment",
+                        "in": "query",
+                        "description": "Filter by equipment type",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "difficulty",
+                        "in": "query",
+                        "description": "Filter by difficulty level",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "source_exercise_id",
+                        "in": "query",
+                        "description": "Filter by source exercise ID from imported dataset",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "source_slug",
+                        "in": "query",
+                        "description": "Filter by source slug from imported dataset",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "active_only",
+                        "in": "query",
+                        "description": "Only show active exercises",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": true
+                        }
+                    },
+                    {
+                        "name": "has_image",
+                        "in": "query",
+                        "description": "Filter exercises that have an image or GIF",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "has_gallery",
+                        "in": "query",
+                        "description": "Filter exercises that have more than one linked image",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "has_video",
+                        "in": "query",
+                        "description": "Filter exercises that have a video URL",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "sort_by",
+                        "in": "query",
+                        "description": "Field to sort by",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "exercise_name",
+                                "order_index",
+                                "created_at",
+                                "updated_at"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "sort_direction",
+                        "in": "query",
+                        "description": "Sort direction",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "asc",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Exercise list",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string",
+                                                        "example": "f44d1d89-2d58-4fe5-8ae7-0fd1a6a4f7d0"
+                                                    },
+                                                    "exercise_name": {
+                                                        "type": "string",
+                                                        "example": "Prisoner Squat - Bodyweight"
+                                                    },
+                                                    "source_match_key": {
+                                                        "type": "string",
+                                                        "example": "prisonersquatbodyweight"
+                                                    },
+                                                    "source_exercise_id": {
+                                                        "type": "string",
+                                                        "example": "d16cec81-500f-4a0b-8f51-ee2efe91ecee"
+                                                    },
+                                                    "source_slug": {
+                                                        "type": "string",
+                                                        "example": "prisoner-squat-bodyweight"
+                                                    },
+                                                    "source_image_name": {
+                                                        "type": "string",
+                                                        "example": "full-body-person-doing-pushup0.jpeg"
+                                                    },
+                                                    "image_path": {
+                                                        "type": "string",
+                                                        "example": "exercise-library/imports/20260511123000-abcd1234/inline-images/0001-push-up.jpeg"
+                                                    },
+                                                    "image_url": {
+                                                        "type": "string",
+                                                        "example": "https://example.com/exercise-library/media/exercise-library/imports/.../0001-push-up.jpeg"
+                                                    },
+                                                    "image_urls": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string",
+                                                            "example": "https://example.com/exercise-library/media/exercise-library/imports/.../0001-push-up.jpeg"
+                                                        }
+                                                    },
+                                                    "image_width": {
+                                                        "type": "integer",
+                                                        "example": 183
+                                                    },
+                                                    "image_height": {
+                                                        "type": "integer",
+                                                        "example": 275
+                                                    },
+                                                    "pose_landmarks_json": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "target_muscle_group": {
+                                                        "type": "string",
+                                                        "example": "glute, quad, thigh - inner"
+                                                    },
+                                                    "body_part": {
+                                                        "type": "string",
+                                                        "example": "lower body"
+                                                    },
+                                                    "exercise_category": {
+                                                        "type": "string",
+                                                        "example": "strength"
+                                                    },
+                                                    "equipment_type": {
+                                                        "type": "string",
+                                                        "example": "bodyweight"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 20
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 200
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/user-app/exercises/{identifier}": {
+            "get": {
+                "tags": [
+                    "User App: Exercise Library"
+                ],
+                "summary": "Get exercise details",
+                "description": "Fetch a single exercise by UUID or name slug for mobile detail screens.",
+                "operationId": "2753151b56b4c4999613974ba02c12e6",
+                "parameters": [
+                    {
+                        "name": "identifier",
+                        "in": "path",
+                        "description": "Exercise UUID or slugified name",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Exercise detail",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "exercise_name": {
+                                                    "type": "string",
+                                                    "example": "Prisoner Squat - Bodyweight"
+                                                },
+                                                "source_match_key": {
+                                                    "type": "string",
+                                                    "example": "prisonersquatbodyweight"
+                                                },
+                                                "source_exercise_id": {
+                                                    "type": "string",
+                                                    "example": "d16cec81-500f-4a0b-8f51-ee2efe91ecee"
+                                                },
+                                                "source_slug": {
+                                                    "type": "string",
+                                                    "example": "prisoner-squat-bodyweight"
+                                                },
+                                                "source_image_name": {
+                                                    "type": "string",
+                                                    "example": "full-body-person-doing-pushup0.jpeg"
+                                                },
+                                                "image_path": {
+                                                    "type": "string",
+                                                    "example": "exercise-library/imports/.../0001-prisoner-squat-bodyweight.jpeg"
+                                                },
+                                                "image_url": {
+                                                    "type": "string",
+                                                    "example": "https://example.com/exercise-library/media/exercise-library/imports/.../0001-prisoner-squat-bodyweight.jpeg"
+                                                },
+                                                "image_urls": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "image_width": {
+                                                    "type": "integer",
+                                                    "example": 183
+                                                },
+                                                "image_height": {
+                                                    "type": "integer",
+                                                    "example": 275
+                                                },
+                                                "pose_landmarks_json": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Exercise not found"
+                    }
+                }
+            }
+        },
+        "/user-app/exercises/filters": {
+            "get": {
+                "tags": [
+                    "User App: Exercise Library"
+                ],
+                "summary": "Get available filters",
+                "description": "Returns the distinct filter values available in the exercise library for mobile UI filter chips and dropdowns.",
+                "operationId": "d7c85fc96a5c1731f55cd171e0fedc02",
+                "responses": {
+                    "200": {
+                        "description": "Available filters"
+                    }
+                }
+            }
+        },
         "/user-app/gyms": {
             "get": {
                 "tags": [
@@ -3075,6 +3461,10 @@
         }
     },
     "tags": [
+        {
+            "name": "User App: Exercise Library",
+            "description": "Mobile exercise library APIs with advanced filtering"
+        },
         {
             "name": "Gym Auth",
             "description": "Gym Auth"

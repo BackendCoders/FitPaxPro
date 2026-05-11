@@ -33,6 +33,7 @@ class ExerciseLibraryController extends Controller
      *     @OA\Parameter(name="source_slug", in="query", required=false, @OA\Schema(type="string"), description="Filter by source slug from imported dataset"),
      *     @OA\Parameter(name="active_only", in="query", required=false, @OA\Schema(type="boolean", default=true), description="Only show active exercises"),
      *     @OA\Parameter(name="has_image", in="query", required=false, @OA\Schema(type="boolean"), description="Filter exercises that have an image or GIF"),
+     *     @OA\Parameter(name="has_gallery", in="query", required=false, @OA\Schema(type="boolean"), description="Filter exercises that have more than one linked image"),
      *     @OA\Parameter(name="has_video", in="query", required=false, @OA\Schema(type="boolean"), description="Filter exercises that have a video URL"),
      *     @OA\Parameter(name="sort_by", in="query", required=false, @OA\Schema(type="string", enum={"exercise_name","order_index","created_at","updated_at"}), description="Field to sort by"),
      *     @OA\Parameter(name="sort_direction", in="query", required=false, @OA\Schema(type="string", enum={"asc","desc"}, default="asc"), description="Sort direction"),
@@ -42,8 +43,37 @@ class ExerciseLibraryController extends Controller
      *         description="Exercise list",
      *         @OA\JsonContent(
      *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="data", type="array", @OA\Items(type="object")),
-     *             @OA\Property(property="meta", type="object")
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="string", example="f44d1d89-2d58-4fe5-8ae7-0fd1a6a4f7d0"),
+     *                     @OA\Property(property="exercise_name", type="string", example="Prisoner Squat - Bodyweight"),
+     *                     @OA\Property(property="source_match_key", type="string", example="prisonersquatbodyweight"),
+     *                     @OA\Property(property="source_exercise_id", type="string", example="d16cec81-500f-4a0b-8f51-ee2efe91ecee"),
+     *                     @OA\Property(property="source_slug", type="string", example="prisoner-squat-bodyweight"),
+     *                     @OA\Property(property="source_image_name", type="string", example="full-body-person-doing-pushup0.jpeg"),
+     *                     @OA\Property(property="image_path", type="string", example="exercise-library/imports/20260511123000-abcd1234/inline-images/0001-push-up.jpeg"),
+     *                     @OA\Property(property="image_url", type="string", example="https://example.com/exercise-library/media/exercise-library/imports/.../0001-push-up.jpeg"),
+     *                     @OA\Property(property="image_urls", type="array", @OA\Items(type="string", example="https://example.com/exercise-library/media/exercise-library/imports/.../0001-push-up.jpeg")),
+     *                     @OA\Property(property="image_width", type="integer", example=183),
+     *                     @OA\Property(property="image_height", type="integer", example=275),
+     *                     @OA\Property(property="pose_landmarks_json", type="array", @OA\Items(type="string")),
+     *                     @OA\Property(property="target_muscle_group", type="string", example="glute, quad, thigh - inner"),
+     *                     @OA\Property(property="body_part", type="string", example="lower body"),
+     *                     @OA\Property(property="exercise_category", type="string", example="strength"),
+     *                     @OA\Property(property="equipment_type", type="string", example="bodyweight")
+     *                 )
+     *             ),
+     *             @OA\Property(
+     *                 property="meta",
+     *                 type="object",
+     *                 @OA\Property(property="current_page", type="integer", example=1),
+     *                 @OA\Property(property="last_page", type="integer", example=10),
+     *                 @OA\Property(property="per_page", type="integer", example=20),
+     *                 @OA\Property(property="total", type="integer", example=200)
+     *             )
      *         )
      *     )
      * )
@@ -89,6 +119,13 @@ class ExerciseLibraryController extends Controller
             }));
         }
 
+        if ($request->filled('has_gallery')) {
+            $hasGallery = $request->boolean('has_gallery');
+            $query->when($hasGallery, fn ($builder) => $builder->whereNotNull('image_paths_json')->whereJsonLength('image_paths_json', '>', 1), fn ($builder) => $builder->where(function ($inner) {
+                $inner->whereNull('image_paths_json')->orWhereJsonLength('image_paths_json', '<=', 1);
+            }));
+        }
+
         if ($request->filled('has_video')) {
             $hasVideo = $request->boolean('has_video');
             $query->when($hasVideo, fn ($builder) => $builder->whereNotNull('instruction_video_url')->where('instruction_video_url', '!=', ''), fn ($builder) => $builder->where(function ($inner) {
@@ -131,7 +168,25 @@ class ExerciseLibraryController extends Controller
      *     @OA\Parameter(name="identifier", in="path", required=true, @OA\Schema(type="string"), description="Exercise UUID or slugified name"),
      *     @OA\Response(
      *         response=200,
-     *         description="Exercise detail"
+     *         description="Exercise detail",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="exercise_name", type="string", example="Prisoner Squat - Bodyweight"),
+     *                 @OA\Property(property="source_match_key", type="string", example="prisonersquatbodyweight"),
+     *                 @OA\Property(property="source_exercise_id", type="string", example="d16cec81-500f-4a0b-8f51-ee2efe91ecee"),
+     *                 @OA\Property(property="source_slug", type="string", example="prisoner-squat-bodyweight"),
+     *                 @OA\Property(property="source_image_name", type="string", example="full-body-person-doing-pushup0.jpeg"),
+     *                 @OA\Property(property="image_path", type="string", example="exercise-library/imports/.../0001-prisoner-squat-bodyweight.jpeg"),
+     *                 @OA\Property(property="image_url", type="string", example="https://example.com/exercise-library/media/exercise-library/imports/.../0001-prisoner-squat-bodyweight.jpeg"),
+     *                 @OA\Property(property="image_urls", type="array", @OA\Items(type="string")),
+     *                 @OA\Property(property="image_width", type="integer", example=183),
+     *                 @OA\Property(property="image_height", type="integer", example=275),
+     *                 @OA\Property(property="pose_landmarks_json", type="array", @OA\Items(type="string"))
+     *             )
+     *         )
      *     ),
      *     @OA\Response(response=404, description="Exercise not found")
      * )
