@@ -83,43 +83,79 @@ class ExerciseLibraryController extends Controller
     public function import(Request $request)
     {
         $request->validate([
-            'import_file' => 'required|file|mimes:json,csv,txt|max:10240',
+            'import_files' => 'required|array|min:1',
+            'import_files.*' => 'required|file|max:20480',
         ]);
-
-        $file = $request->file('import_file');
-        $extension = strtolower($file->getClientOriginalExtension());
-        $raw = file_get_contents($file->getRealPath());
-
-        $rows = match ($extension) {
-            'csv' => $this->parseCsvRows($raw),
-            default => $this->parseJsonRows($raw),
-        };
 
         $created = 0;
         $skipped = 0;
         $errors = [];
-        $defaultCategory = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        $files = collect($request->file('import_files'))
+            ->filter(fn ($file) => $file && $file->isValid())
+            ->sortBy(fn ($file) => $this->normalizeImportPath($file->getClientOriginalName()))
+            ->values();
 
-        foreach ($rows as $index => $row) {
-            try {
-                $payload = $this->normalizeImportedRow($row, $defaultCategory);
+        $supportedDataExtensions = ['json', 'csv', 'txt'];
+        $supportedImageExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp', 'svg'];
+        $dataFiles = [];
+        $imageFiles = [];
 
-                if (!$payload['exercise_name']) {
-                    $skipped++;
-                    continue;
-                }
+        foreach ($files as $file) {
+            $extension = strtolower($file->getClientOriginalExtension());
 
-                $existing = ExerciseLibraryItem::where('exercise_name', $payload['exercise_name'])->first();
-                if ($existing) {
-                    $existing->update($payload);
-                } else {
-                    ExerciseLibraryItem::create($payload);
-                }
-
-                $created++;
-            } catch (\Throwable $e) {
+            if (in_array($extension, $supportedDataExtensions, true)) {
+                $dataFiles[] = $file;
+            } elseif (in_array($extension, $supportedImageExtensions, true)) {
+                $imageFiles[] = $file;
+            } else {
                 $skipped++;
-                $errors[] = "Row " . ($index + 1) . ": " . $e->getMessage();
+            }
+        }
+
+        $batchToken = now()->format('YmdHis') . '-' . Str::random(8);
+        $imageIndex = [];
+
+        foreach ($imageFiles as $position => $imageFile) {
+            $storedPath = $this->storeImportedImage($imageFile, $batchToken, $position);
+            $this->registerImageIndex($imageIndex, $imageFile->getClientOriginalName(), $storedPath);
+        }
+
+        foreach ($dataFiles as $file) {
+            $extension = strtolower($file->getClientOriginalExtension());
+            $raw = file_get_contents($file->getRealPath());
+
+            $rows = match ($extension) {
+                'csv' => $this->parseCsvRows($raw),
+                default => $this->parseJsonRows($raw),
+            };
+
+            $defaultCategory = $this->deriveCategoryFromPath($file->getClientOriginalName());
+
+            foreach ($rows as $index => $row) {
+                try {
+                    $payload = $this->normalizeImportedRow($row, $defaultCategory);
+
+                    if (!$payload['exercise_name']) {
+                        $skipped++;
+                        continue;
+                    }
+
+                    if (empty($payload['image_path'])) {
+                        $payload['image_path'] = $this->resolveImportedImage($row, $imageIndex, $payload['exercise_name'], $defaultCategory);
+                    }
+
+                    $existing = ExerciseLibraryItem::where('exercise_name', $payload['exercise_name'])->first();
+                    if ($existing) {
+                        $existing->update($payload);
+                    } else {
+                        ExerciseLibraryItem::create($payload);
+                    }
+
+                    $created++;
+                } catch (\Throwable $e) {
+                    $skipped++;
+                    $errors[] = $file->getClientOriginalName() . ' :: Row ' . ($index + 1) . ': ' . $e->getMessage();
+                }
             }
         }
 
@@ -209,11 +245,9 @@ class ExerciseLibraryController extends Controller
     private function normalizeImportedRow(array $row, string $defaultCategory): array
     {
         $exerciseName = $row['exercise_name'] ?? $row['name'] ?? $row['title'] ?? null;
-        $slug = $row['slug'] ?? Str::slug((string) $exerciseName);
         $instructions = $row['instructions'] ?? $row['steps'] ?? null;
         $tips = $row['tips'] ?? $row['notes'] ?? null;
         $primaryMuscles = $row['primaryMuscles'] ?? $row['primary_muscles'] ?? $row['target_muscle_group'] ?? null;
-        $secondaryMuscles = $row['secondaryMuscles'] ?? $row['secondary_muscles'] ?? null;
 
         return [
             'exercise_name' => $exerciseName,
@@ -232,6 +266,87 @@ class ExerciseLibraryController extends Controller
             'order_index' => $this->toIntegerOrNull($row['order_index'] ?? $row['order'] ?? 0) ?? 0,
             'is_active' => $this->toBoolean($row['is_active'] ?? $row['status'] ?? true),
         ];
+    }
+
+    private function deriveCategoryFromPath(string $path): string
+    {
+        $normalized = $this->normalizeImportPath($path);
+        $segments = array_values(array_filter(explode('/', $normalized)));
+
+        if (count($segments) > 1) {
+            return Str::headline(pathinfo($segments[0], PATHINFO_FILENAME)) ?: pathinfo($segments[0], PATHINFO_FILENAME);
+        }
+
+        return pathinfo($normalized, PATHINFO_FILENAME);
+    }
+
+    private function normalizeImportPath(string $path): string
+    {
+        return str_replace('\\', '/', trim($path));
+    }
+
+    private function storeImportedImage($file, string $batchToken, int $position): string
+    {
+        $relativePath = $this->normalizeImportPath($file->getClientOriginalName());
+        $extension = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: 'jpg');
+        $basename = pathinfo($relativePath, PATHINFO_FILENAME);
+        $safeName = Str::slug($basename) ?: 'exercise-image';
+        $storedName = $position . '-' . Str::random(6) . '-' . $safeName . '.' . $extension;
+
+        return $file->storeAs("exercise-library/imports/{$batchToken}", $storedName, 'public');
+    }
+
+    private function registerImageIndex(array &$index, string $sourcePath, string $storedPath): void
+    {
+        $normalized = $this->normalizeImportPath($sourcePath);
+        $basename = pathinfo($normalized, PATHINFO_FILENAME);
+        $keys = [
+            Str::slug($normalized),
+            Str::slug($basename),
+            strtolower($normalized),
+            strtolower($basename),
+        ];
+
+        foreach ($keys as $key) {
+            if ($key) {
+                $index[$key] = $storedPath;
+            }
+        }
+    }
+
+    private function resolveImportedImage(array $row, array $imageIndex, string $exerciseName, string $defaultCategory): ?string
+    {
+        $references = [
+            $row['image_path'] ?? null,
+            $row['image'] ?? null,
+            $row['image_url'] ?? null,
+            $row['slug'] ?? null,
+            $exerciseName,
+            $defaultCategory,
+        ];
+
+        foreach ($references as $reference) {
+            if (!$reference) {
+                continue;
+            }
+
+            $normalized = $this->normalizeImportPath((string) $reference);
+            $basename = pathinfo($normalized, PATHINFO_FILENAME);
+            $keys = [
+                Str::slug($normalized),
+                Str::slug($basename),
+                strtolower($normalized),
+                strtolower($basename),
+            ];
+
+            foreach ($keys as $key) {
+                if ($key && isset($imageIndex[$key])) {
+                    return $imageIndex[$key];
+                }
+            }
+        }
+
+        return null;
     }
 
     private function toDelimitedText(mixed $value): ?string
