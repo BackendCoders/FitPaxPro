@@ -136,12 +136,12 @@ interface GymRepositoryInterface
     /**
      * Diet Plans
      */
-    public function getDietPlans();
+    public function getDietPlans(?string $userId = null);
 
     /**
      * Exercise Plans
      */
-    public function getExercisePlans();
+    public function getExercisePlans(?string $userId = null);
 
     /**
      * Gym Enquiries

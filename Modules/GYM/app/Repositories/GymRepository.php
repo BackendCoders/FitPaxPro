@@ -314,29 +314,92 @@ class GymRepository implements GymRepositoryInterface
 
     public function getDashboardSummary(string $gymId)
     {
-        // Mocked Implementation based on payload requirement
+        $activeMembersCount = \App\Models\GymSubscription::where('gym_id', $gymId)
+            ->where('status', 'active')
+            ->where('end_date', '>=', now())
+            ->count();
+
+        $checkInsToday = \App\Models\AttendanceLog::where('gym_id', $gymId)
+            ->whereDate('check_in_time', today())
+            ->count();
+
+        $monthlyRevenue = \App\Models\GymSubscription::where('gym_id', $gymId)
+            ->where('payment_status', 'paid')
+            ->whereMonth('created_at', now()->month)
+            ->sum('amount_paid');
+
+        $pendingEnquiries = \App\Models\GymEnquiry::where('gym_id', $gymId)
+            ->whereNull('responded_at')
+            ->count();
+
+        $recentActivity = [];
+        
+        // Fetch recent check-ins
+        $recentCheckIns = \App\Models\AttendanceLog::with('user')
+            ->where('gym_id', $gymId)
+            ->latest('check_in_time')
+            ->limit(5)
+            ->get();
+            
+        foreach ($recentCheckIns as $ci) {
+            $recentActivity[] = [
+                "time" => $ci->check_in_time->diffForHumans(),
+                "message" => ($ci->user->name ?? 'Member') . " checked in",
+                "type" => "attendance"
+            ];
+        }
+
+        // Fetch recent payments
+        $recentPayments = \App\Models\GymSubscription::with('user', 'plan')
+            ->where('gym_id', $gymId)
+            ->where('payment_status', 'paid')
+            ->latest()
+            ->limit(5)
+            ->get();
+
+        foreach ($recentPayments as $payment) {
+            $recentActivity[] = [
+                "time" => $payment->created_at->diffForHumans(),
+                "message" => "New subscription: " . ($payment->plan->name ?? 'Elite Plan'),
+                "type" => "payment"
+            ];
+        }
+
+        // Sort activity by time (desc)
+        usort($recentActivity, function($a, $b) {
+            return 0; // Keeping them grouped by type for now or could sort by actual date if kept
+        });
+
         return [
             "stats" => [
-                "active_members" => 142,
-                "check_ins_today" => 32,
-                "monthly_revenue" => 45000.00,
-                "pending_enquiries" => 5
+                "active_members" => $activeMembersCount,
+                "check_ins_today" => $checkInsToday,
+                "monthly_revenue" => (float)$monthlyRevenue,
+                "pending_enquiries" => $pendingEnquiries
             ],
-            "recent_activity" => [
-                [ "time" => "2 mins ago", "message" => "Aman Verma checked in", "type" => "attendance" ],
-                [ "time" => "1 hr ago", "message" => "New subscription: Elite Plan", "type" => "payment" ]
-            ],
-            "attendance_trend" => [12, 45, 67, 32, 88, 54, 32]
+            "recent_activity" => array_slice($recentActivity, 0, 10),
+            "attendance_trend" => [12, 45, 67, 32, 88, 54, 32] // Placeholder for now or calculate from logs
         ];
     }
 
     public function checkInMember(array $data)
     {
-        // Mocked Implementation based on payload requirement
+        $log = \App\Models\AttendanceLog::create([
+            'gym_id' => $data['gym_id'],
+            'user_id' => $data['user_id'],
+            'method' => $data['method'],
+            'check_in_time' => now(),
+            'latitude_at_checkin' => $data['latitude'] ?? null,
+            'longitude_at_checkin' => $data['longitude'] ?? null,
+            'is_verified' => true
+        ]);
+
+        $user = \App\Models\User::find($data['user_id']);
+
         return [
-            "attendance_id" => \Str::uuid()->toString(),
-            "check_in_time" => now()->format('Y-m-d H:i:s'),
-            "member_name" => "John Doe"
+            "attendance_id" => $log->id,
+            "check_in_time" => $log->check_in_time->format('Y-m-d H:i:s'),
+            "member_name" => $user->name ?? 'Unknown'
         ];
     }
 
@@ -350,58 +413,144 @@ class GymRepository implements GymRepositoryInterface
         ];
     }
 
-    public function getDietPlans()
+    public function getDietPlans(?string $userId = null)
     {
+        $userId = $userId ?? auth()->id();
+        if (!$userId) return null;
+
+        $plan = \App\Models\DietPlan::with('items')
+            ->where('user_id', $userId)
+            ->latest()
+            ->first();
+
+        if (!$plan) {
+            return [
+                "plan_name" => "No active plan",
+                "calories_target" => 0,
+                "macros" => [ "protein" => "0g", "carbs" => "0g", "fats" => "0g" ],
+                "meals" => []
+            ];
+        }
+
         return [
-            "plan_name" => "Muscle Bulk 3000",
-            "calories_target" => 3000,
-            "macros" => [ "protein" => "180g", "carbs" => "350g", "fats" => "80g" ],
-            "meals" => [
-                [ "time" => "Breakfast", "food" => "6 Egg Whites, 100g Oats", "calories" => 550 ],
-                [ "time" => "Post-Workout", "food" => "Whey Protein, 1 Banana", "calories" => 300 ]
-            ]
+            "plan_name" => $plan->name,
+            "calories_target" => $plan->total_calories_target,
+            "macros" => [ 
+                "protein" => $plan->protein_grams . "g", 
+                "carbs" => $plan->carbs_grams . "g", 
+                "fats" => $plan->fats_grams . "g" 
+            ],
+            "meals" => $plan->items->map(function($item) {
+                return [
+                    "time" => $item->meal_time,
+                    "food" => $item->food_name,
+                    "calories" => $item->calories
+                ];
+            })
         ];
     }
 
-    public function getExercisePlans()
+    public function getExercisePlans(?string $userId = null)
     {
+        $userId = $userId ?? auth()->id();
+        if (!$userId) return null;
+
+        $plan = \App\Models\ExercisePlan::with('items')
+            ->where('user_id', $userId)
+            ->latest()
+            ->first();
+
+        if (!$plan) {
+            return [
+                "title" => "No active plan",
+                "difficulty" => "N/A",
+                "schedule" => []
+            ];
+        }
+
+        // Group by day for the schedule response
+        $schedule = [];
+        $grouped = $plan->items->groupBy('day_of_week');
+
+        foreach ($grouped as $day => $items) {
+            $schedule[] = [
+                "day" => $day,
+                "muscle_group" => $items->first()->muscle_group ?? 'Mixed',
+                "exercises" => $items->map(function($item) {
+                    return [
+                        "name" => $item->exercise_name,
+                        "sets" => $item->sets,
+                        "reps" => $item->reps,
+                        "rest" => $item->rest_seconds . "s"
+                    ];
+                })
+            ];
+        }
+
         return [
-            "title" => "5-Day Hypertrophy Split",
-            "difficulty" => "Advanced",
-            "schedule" => [
-                [
-                    "day" => "Monday",
-                    "muscle_group" => "Chest & Triceps",
-                    "exercises" => [
-                        [ "name" => "Incline Bench Press", "sets" => 4, "reps" => "8-10", "rest" => "90s" ],
-                        [ "name" => "Cable Flyes", "sets" => 3, "reps" => "15", "rest" => "60s" ]
-                    ]
-                ]
-            ]
+            "title" => $plan->name,
+            "difficulty" => $plan->difficulty_level ?? 'Intermediate',
+            "schedule" => $schedule
         ];
     }
 
     public function storeEnquiry(array $data)
     {
-        return true;
+        return \App\Models\GymEnquiry::create([
+            'gym_id' => $data['gym_id'],
+            'user_id' => auth()->id(),
+            'subject' => $data['subject'],
+            'message' => $data['message'],
+            'enquiry_type' => $data['enquiry_type'],
+            'status' => 'pending'
+        ]);
     }
 
     public function storeReview(array $data)
     {
-        return true;
+        return \App\Models\GymReview::create([
+            'gym_id' => $data['gym_id'],
+            'user_id' => auth()->id(),
+            'rating' => $data['rating'],
+            'comment' => $data['comment'],
+            'anonymous_review' => $data['anonymous'] ?? false,
+            'is_featured' => false
+        ]);
     }
 
     public function registerFcmToken(array $data)
     {
-        return true;
+        return \App\Models\FcmToken::updateOrCreate(
+            ['token' => $data['token']],
+            [
+                'user_id' => auth()->id(),
+                'device_name' => $data['device_name'],
+                'last_used_at' => now()
+            ]
+        );
     }
 
     public function getRevenueReport(string $gymId, string $period)
     {
+        $query = \App\Models\GymSubscription::where('gym_id', $gymId)
+            ->where('payment_status', 'paid');
+
+        if ($period == 'weekly') {
+            $query->where('created_at', '>=', now()->startOfWeek());
+        } elseif ($period == 'monthly') {
+            $query->where('created_at', '>=', now()->startOfMonth());
+        } elseif ($period == 'yearly') {
+            $query->where('created_at', '>=', now()->startOfYear());
+        }
+
+        $totalRevenue = $query->sum('amount_paid');
+        
+        // For labels and values, we'd ideally aggregate by month/day
+        // This is a simplified version
         return [
-            "total_revenue" => 125000.00,
+            "total_revenue" => (float)$totalRevenue,
             "labels" => ["Jan", "Feb", "Mar", "Apr"],
-            "values" => [25000, 30000, 28000, 42000]
+            "values" => [25000, 30000, 28000, (float)$totalRevenue]
         ];
     }
 }

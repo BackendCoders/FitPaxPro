@@ -32,7 +32,7 @@ class MissingUserApiController extends Controller
      */
     public function dietPlans()
     {
-        $data = $this->gymRepository->getDietPlans();
+        $data = $this->gymRepository->getDietPlans(auth()->id());
         return response()->json(['success' => true, 'data' => $data], 200);
     }
 
@@ -47,7 +47,7 @@ class MissingUserApiController extends Controller
      */
     public function exercisePlans()
     {
-        $data = $this->gymRepository->getExercisePlans();
+        $data = $this->gymRepository->getExercisePlans(auth()->id());
         return response()->json(['success' => true, 'data' => $data], 200);
     }
 
