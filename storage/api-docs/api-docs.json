@@ -2303,6 +2303,240 @@
                 }
             }
         },
+        "/api/gym/dashboard/summary": {
+            "get": {
+                "tags": [
+                    "Gym Operations"
+                ],
+                "summary": "Dashboard Summary",
+                "description": "Consolidates KPIs for the Gym Owner's main screen.",
+                "operationId": "97a2952d44f317564d157b7339876128",
+                "parameters": [
+                    {
+                        "name": "gym_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
+        },
+        "/api/gym/attendance/check-in": {
+            "post": {
+                "tags": [
+                    "Gym Operations"
+                ],
+                "summary": "Member Attendance Check-In",
+                "description": "Registers a member's visit to the gym.",
+                "operationId": "77976592c14d0ea6717f5fa6d9a8c91e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "gym_id",
+                                    "user_id",
+                                    "method"
+                                ],
+                                "properties": {
+                                    "gym_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "user_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "method": {
+                                        "type": "string",
+                                        "enum": [
+                                            "qr_code",
+                                            "manual",
+                                            "biometric"
+                                        ]
+                                    },
+                                    "latitude": {
+                                        "type": "number",
+                                        "format": "float"
+                                    },
+                                    "longitude": {
+                                        "type": "number",
+                                        "format": "float"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Check-in successful."
+                    }
+                }
+            }
+        },
+        "/api/provisions/sections": {
+            "get": {
+                "tags": [
+                    "Gym Operations"
+                ],
+                "summary": "Provision Sections",
+                "description": "Dynamically configures the app's available modules based on gym settings.",
+                "operationId": "c821f7a83b6f9b7fd0a39652b75b5969",
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
+        },
+        "/api/gym/enquiries": {
+            "post": {
+                "tags": [
+                    "Gym Operations"
+                ],
+                "summary": "Gym Enquiries",
+                "description": "Allows potential members to ask questions to a gym owner.",
+                "operationId": "2d80331091f72e081a4ed1995de58ba5",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "gym_id",
+                                    "subject",
+                                    "message",
+                                    "enquiry_type"
+                                ],
+                                "properties": {
+                                    "gym_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "subject": {
+                                        "type": "string"
+                                    },
+                                    "message": {
+                                        "type": "string"
+                                    },
+                                    "enquiry_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "membership_plans",
+                                            "facilities",
+                                            "trial_request"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Enquiry sent successfully."
+                    }
+                }
+            }
+        },
+        "/api/gym/reviews": {
+            "post": {
+                "tags": [
+                    "Gym Operations"
+                ],
+                "summary": "Gym Reviews",
+                "description": "Submitting member feedback.",
+                "operationId": "7b6787dfc51c192bed86c3d1cfebc188",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "gym_id",
+                                    "rating",
+                                    "comment"
+                                ],
+                                "properties": {
+                                    "gym_id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "rating": {
+                                        "type": "integer",
+                                        "example": 5
+                                    },
+                                    "comment": {
+                                        "type": "string"
+                                    },
+                                    "anonymous": {
+                                        "type": "boolean",
+                                        "example": false
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Review published."
+                    }
+                }
+            }
+        },
+        "/api/gym/reports/revenue": {
+            "get": {
+                "tags": [
+                    "Gym Operations"
+                ],
+                "summary": "Operations Reports",
+                "description": "Fetches historical revenue data for chart plotting.",
+                "operationId": "e2a765ac5e6d2a730e1a425bfe7626e7",
+                "parameters": [
+                    {
+                        "name": "gym_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "period",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "weekly",
+                                "monthly",
+                                "yearly"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
+        },
         "/user-app/exercises": {
             "get": {
                 "tags": [
@@ -2837,6 +3071,73 @@
                 "responses": {
                     "200": {
                         "description": "List of pricing plans"
+                    }
+                }
+            }
+        },
+        "/api/user-app/profile/diet-plans": {
+            "get": {
+                "tags": [
+                    "User App Profile"
+                ],
+                "summary": "Diet Plans",
+                "description": "Fetches the assigned meal plan for a member.",
+                "operationId": "5c9f8aeddcc91c8eadb9d97139f2659d",
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
+        },
+        "/api/user-app/profile/exercise-plans": {
+            "get": {
+                "tags": [
+                    "User App Profile"
+                ],
+                "summary": "Exercise Plans",
+                "description": "Fetches the weekly workout schedule for a member.",
+                "operationId": "527d20bdf962fbe7778a5c503207d9c5",
+                "responses": {
+                    "200": {
+                        "description": "Successful response"
+                    }
+                }
+            }
+        },
+        "/api/fcm/register-token": {
+            "post": {
+                "tags": [
+                    "User App Profile"
+                ],
+                "summary": "FCM Token Registration",
+                "description": "Links a device token to a user for push notifications.",
+                "operationId": "2bb11a89d5f34fa51d2be317b51a789e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "token",
+                                    "device_name"
+                                ],
+                                "properties": {
+                                    "token": {
+                                        "type": "string"
+                                    },
+                                    "device_name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "FCM Token updated."
                     }
                 }
             }
@@ -3497,8 +3798,16 @@
     },
     "tags": [
         {
+            "name": "Gym Operations",
+            "description": "API Endpoints for Gym Management and Operations"
+        },
+        {
             "name": "User App: Exercise Library",
             "description": "Mobile exercise library APIs with advanced filtering"
+        },
+        {
+            "name": "User App Profile",
+            "description": "API Endpoints for User Personalization and Training"
         },
         {
             "name": "Gym Auth",

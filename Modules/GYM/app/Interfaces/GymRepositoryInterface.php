@@ -117,4 +117,49 @@ interface GymRepositoryInterface
     public function initiateNode(\App\Models\User $owner, array $data);
     public function syncNodePlans(\App\Models\Gym $gym, ?array $templateIds, ?array $customPlans);
     public function uploadNodeAssets(\App\Models\Gym $gym, $mainImage, ?array $gallery, array $youtubeLinks = []);
+
+    /**
+     * Dashboard Summary
+     */
+    public function getDashboardSummary(string $gymId);
+
+    /**
+     * Member Attendance Check-In
+     */
+    public function checkInMember(array $data);
+
+    /**
+     * Provision Sections
+     */
+    public function getProvisionSections();
+
+    /**
+     * Diet Plans
+     */
+    public function getDietPlans();
+
+    /**
+     * Exercise Plans
+     */
+    public function getExercisePlans();
+
+    /**
+     * Gym Enquiries
+     */
+    public function storeEnquiry(array $data);
+
+    /**
+     * Gym Reviews
+     */
+    public function storeReview(array $data);
+
+    /**
+     * FCM Token Registration
+     */
+    public function registerFcmToken(array $data);
+
+    /**
+     * Operations Reports - Revenue
+     */
+    public function getRevenueReport(string $gymId, string $period);
 }

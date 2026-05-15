@@ -311,4 +311,97 @@ class GymRepository implements GymRepositoryInterface
             }
         }
     }
+
+    public function getDashboardSummary(string $gymId)
+    {
+        // Mocked Implementation based on payload requirement
+        return [
+            "stats" => [
+                "active_members" => 142,
+                "check_ins_today" => 32,
+                "monthly_revenue" => 45000.00,
+                "pending_enquiries" => 5
+            ],
+            "recent_activity" => [
+                [ "time" => "2 mins ago", "message" => "Aman Verma checked in", "type" => "attendance" ],
+                [ "time" => "1 hr ago", "message" => "New subscription: Elite Plan", "type" => "payment" ]
+            ],
+            "attendance_trend" => [12, 45, 67, 32, 88, 54, 32]
+        ];
+    }
+
+    public function checkInMember(array $data)
+    {
+        // Mocked Implementation based on payload requirement
+        return [
+            "attendance_id" => \Str::uuid()->toString(),
+            "check_in_time" => now()->format('Y-m-d H:i:s'),
+            "member_name" => "John Doe"
+        ];
+    }
+
+    public function getProvisionSections()
+    {
+        return [
+            [ "id" => "attendance", "title" => "Attendance", "icon" => "fact_check", "route" => "/attendance", "color" => "#FCA5A5" ],
+            [ "id" => "members", "title" => "Members", "icon" => "people", "route" => "/members", "color" => "#7DD3FC" ],
+            [ "id" => "classes", "title" => "Classes", "icon" => "fitness_center", "route" => "/classes", "color" => "#5EEAD4" ],
+            [ "id" => "reports", "title" => "Reports", "icon" => "analytics", "route" => "/reports", "color" => "#B794F4" ]
+        ];
+    }
+
+    public function getDietPlans()
+    {
+        return [
+            "plan_name" => "Muscle Bulk 3000",
+            "calories_target" => 3000,
+            "macros" => [ "protein" => "180g", "carbs" => "350g", "fats" => "80g" ],
+            "meals" => [
+                [ "time" => "Breakfast", "food" => "6 Egg Whites, 100g Oats", "calories" => 550 ],
+                [ "time" => "Post-Workout", "food" => "Whey Protein, 1 Banana", "calories" => 300 ]
+            ]
+        ];
+    }
+
+    public function getExercisePlans()
+    {
+        return [
+            "title" => "5-Day Hypertrophy Split",
+            "difficulty" => "Advanced",
+            "schedule" => [
+                [
+                    "day" => "Monday",
+                    "muscle_group" => "Chest & Triceps",
+                    "exercises" => [
+                        [ "name" => "Incline Bench Press", "sets" => 4, "reps" => "8-10", "rest" => "90s" ],
+                        [ "name" => "Cable Flyes", "sets" => 3, "reps" => "15", "rest" => "60s" ]
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    public function storeEnquiry(array $data)
+    {
+        return true;
+    }
+
+    public function storeReview(array $data)
+    {
+        return true;
+    }
+
+    public function registerFcmToken(array $data)
+    {
+        return true;
+    }
+
+    public function getRevenueReport(string $gymId, string $period)
+    {
+        return [
+            "total_revenue" => 125000.00,
+            "labels" => ["Jan", "Feb", "Mar", "Apr"],
+            "values" => [25000, 30000, 28000, 42000]
+        ];
+    }
 }

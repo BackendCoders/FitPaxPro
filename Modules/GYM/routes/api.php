@@ -5,6 +5,7 @@ use Modules\GYM\app\Http\Controllers\Api\AuthController;
 use Modules\GYM\app\Http\Controllers\Api\GymController;
 use Modules\GYM\app\Http\Controllers\Api\GymRegistrationController;
 use Modules\GYM\app\Http\Controllers\Api\GymPlanController;
+use Modules\GYM\app\Http\Controllers\Api\MissingGymApiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,7 +26,18 @@ Route::prefix('user-app')->group(function () {
     });
 });
 
+Route::prefix('provisions')->group(function () {
+    Route::get('sections', [MissingGymApiController::class, 'provisionSections']);
+});
+
 Route::prefix('gym')->group(function () {
+    // Missing Endpoints
+    Route::get('dashboard/summary', [MissingGymApiController::class, 'dashboardSummary']);
+    Route::post('attendance/check-in', [MissingGymApiController::class, 'checkIn']);
+    Route::post('enquiries', [MissingGymApiController::class, 'storeEnquiry']);
+    Route::post('reviews', [MissingGymApiController::class, 'storeReview']);
+    Route::get('reports/revenue', [MissingGymApiController::class, 'revenueReport']);
+
     // Identity Protocols
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);

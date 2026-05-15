@@ -23,6 +23,11 @@ use Modules\Users\app\Http\Controllers\Api\UserProfileController;
 use Modules\Users\app\Http\Controllers\Api\GymListingController;
 use Modules\Users\app\Http\Controllers\Api\UserAppDiscoveryController;
 use Modules\Users\app\Http\Controllers\Api\ExerciseLibraryController;
+use Modules\Users\app\Http\Controllers\Api\MissingUserApiController;
+
+Route::prefix('fcm')->group(function () {
+    Route::post('/register-token', [MissingUserApiController::class, 'registerFcmToken']);
+});
 
 Route::prefix('user-app')->group(function () {
     // Discovery & Global Search Routes
@@ -58,5 +63,9 @@ Route::prefix('user-app')->group(function () {
         Route::post('/registration/step-5', [UserAppRegistrationController::class, 'step5']);
 
         Route::post('/profile/measurements', [UserAppProfileController::class, 'logMeasurement']);
+        
+        // Missing Endpoints
+        Route::get('/profile/diet-plans', [MissingUserApiController::class, 'dietPlans']);
+        Route::get('/profile/exercise-plans', [MissingUserApiController::class, 'exercisePlans']);
     });
 });
